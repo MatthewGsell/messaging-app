@@ -1,0 +1,90 @@
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+#root {
+  min-height: 100vh;
+  min-width: 100vw;
+  padding: 0;
+  margin: 0;
+
+}
+
+
+a {
+  color: #ffff;
+  text-decoration: none;
+}
+
+#signlogform > p {
+  font-size: large;
+}
+
+#signlogform > p > a {
+  margin-left: 10px;
+}
+
+
+#signlogcontainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(to right bottom, #d00000, #a70038, #6b0c45, #301834, #0a0a0a);
+
+
+}
+
+#signlogcontainer > h1 {
+  font-family: "Lilita One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #ffff;
+  font-size: 80px;
+
+}
+
+#signlogform {
+  display: flex;
+  flex-direction: column;
+  background-color: #1f1f1f;
+  height: 500px;
+  width: 700px;
+  border-radius: 20px;
+  align-items: center;
+}
+.signloginputlabel {
+  font-size: 40px;
+  font-family: "Lilita One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #ffff;
+  text-align: center;
+}
+
+#signlogform > input, #signlogform div, #signlogform > button {
+  margin-top: 3%;
+  margin-bottom: 3%
+} 
+
+#signlogform > input {
+  width: 50%;
+  height: 10%;
+  border-radius: 10px;
+}
+#signlogform > button {
+  width: 25%;
+  height: 10%;
+  border-radius: 10px;
+  background-image: linear-gradient(to right bottom, #d00000, #a70038, #6b0c45, #301834, #0a0a0a);
+  color: #ffff;
+  font-size: 20px;
+  transition: .4s ease-in-out
+}
+
+#signlogform > button:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
