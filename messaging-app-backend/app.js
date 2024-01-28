@@ -35,38 +35,6 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
-async function mockmessages() {
-  const dm1 = new Message({
-    users: ["65b4e8939b6387fade2294b3", "65b4e8a19b6387fade2294b6"],
-    messages: [
-      { message: "hey", user: "65b4e8939b6387fade2294b3" },
-      { message: "whaddup", user: "65b4e8a19b6387fade2294b6" },
-      { message: "whaddup", user: "65b4e8939b6387fade2294b3" },
-    ],
-  });
-
-  const dm2 = new Message({
-    users: ["65b4e8939b6387fade2294b3", "65b503ef672eaa4771905b7e"],
-    messages: [
-      { message: "hey", user: "65b4e8939b6387fade2294b3" },
-      { message: "whaddup", user: "65b503ef672eaa4771905b7e" },
-      { message: "whaddup", user: "65b4e8939b6387fade2294b3" },
-    ],
-  });
-
-  const dm3 = new Message({
-    users: ["65b4e8a19b6387fade2294b6", "65b503ef672eaa4771905b7e"],
-    messages: [
-      { message: "hey", user: "65b4e8a19b6387fade2294b6" },
-      { message: "whaddup", user: "65b503ef672eaa4771905b7e" },
-      { message: "whaddup", user: "65b4e8a19b6387fade2294b6" },
-    ],
-  });
-  await dm1.save();
-  await dm2.save();
-  await dm3.save();
-}
-
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development

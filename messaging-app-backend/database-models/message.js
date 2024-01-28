@@ -5,4 +5,4 @@ const directMessageSchema = mongoose.Schema({
   messages: { type: Array, required: true },
 });
 
-module.exports = mongoose.model("DirectMessage", directMessageSchema);
+module.exports = mongoose.model("Directmessage", directMessageSchema);

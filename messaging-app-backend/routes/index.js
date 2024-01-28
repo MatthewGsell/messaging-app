@@ -78,7 +78,7 @@ router.get(
 );
 
 router.get(
-  "/messages",
+  "/message",
   authorizeuser,
   asynchandler(async (req, res) => {
     const user = await User.findById(req.user._id);
@@ -101,6 +101,33 @@ router.get(
       });
     }
     res.json(listtosend);
+  })
+);
+
+router.post(
+  "/message",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    await DirectMessage.findByIdAndUpdate(req.body.id, {
+      $push: {
+        messages: {
+          message: req.body.message,
+          user: req.user._id,
+          id: req.body.messageid,
+          username: req.user.username,
+        },
+      },
+    });
+    res.json({ username: req.user.username, id: req.user._id });
+  })
+);
+
+router.delete(
+  "/message",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const item = await DirectMessage.findOne({ id: req.body.messsageid });
+    console.log(item);
   })
 );
 
