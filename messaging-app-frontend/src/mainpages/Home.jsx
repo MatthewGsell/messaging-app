@@ -62,6 +62,10 @@ function Home() {
     if (messageList.length > 0) {
       messageList.forEach((message) => {
         const a = crypto.randomUUID();
+        let otheruser = message.otheruser;
+        if (message.otheruser.length > 10) {
+          otheruser = message.otheruser.substring(0, 10) + "...";
+        }
         messageRender.push(
           <div
             key={a}
@@ -69,7 +73,7 @@ function Home() {
             className="dmusernames"
             onClick={changemessagethread}
           >
-            {message.otheruser}
+            <span>{otheruser}</span>
           </div>
         );
       });
@@ -79,6 +83,8 @@ function Home() {
     messageList.forEach((thread) => {
       if (thread.id === e.target.id) {
         setMessageThread(thread);
+        const button = e.target.firstChild;
+        button.classList.add("visible");
       }
     });
   }
@@ -117,6 +123,9 @@ function Home() {
       });
       sendbar = [
         <div key={keytwo} id="sendmessagebar">
+          <button id="closethreadbutton" onClick={closedm}>
+            Close DM
+          </button>
           <textarea id="messagetext" ref={messsagetext}></textarea>
           <button id="messagesendbutton" onClick={sendmessage}>
             Send
@@ -154,18 +163,17 @@ function Home() {
 
     getmessages();
 
-    const newmessagethread = messageThread["messages"].push({
+    messageThread["messages"].push({
       message: messsagetext.current.value,
       user: c.id,
       id: a,
       username: c.username,
     });
-    setMessageList(newmessagethread);
   }
 
   async function deletemessage(e) {
     const itemtodelete = e.target.parentElement.parentElement.id;
-    await fetch("http://localhost:3000/message", {
+    const a = await fetch("http://localhost:3000/message", {
       method: "DELETE",
       credentials: "include",
       headers: {
@@ -176,6 +184,30 @@ function Home() {
         threadid: messageThread.id,
       }),
     });
+    getmessages();
+    const b = await a.json();
+    messageThread["messages"].forEach((message, index) => {
+      console.log(message.id);
+      console.log(b);
+      if (message.id == b) {
+        messageThread["messages"].splice(index, 1);
+      }
+    });
+  }
+
+  async function closedm() {
+    console.log(messageThread);
+    await fetch("http://localhost:3000/closedm", {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messageid: messageThread.id,
+      }),
+    });
+    window.location.reload();
   }
 
   return (
@@ -184,10 +216,22 @@ function Home() {
         <p>Servers</p>
         {serverRender}
       </div>
-      <div id="directmessages">
-        <p>Direct Messages</p>
-        {messageRender}
+      <div id="directmessagescontainer">
+        <div id="directmessages">
+          <p>Direct Messages</p>
+          {messageRender}
+        </div>
+        <div id="addmessagecontainer">
+          <button
+            onClick={() => {
+              navigate("/newmessage");
+            }}
+          >
+            New Message
+          </button>
+        </div>
       </div>
+
       <div id="directmessage">
         <div id="individualmessage">{directMessageRender}</div>
         {sendbar}

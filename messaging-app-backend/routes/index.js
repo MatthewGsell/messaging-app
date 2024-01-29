@@ -7,6 +7,8 @@ const Server = require("../database-models/servers");
 const DirectMessage = require("../database-models/message");
 const jwt = require("jsonwebtoken");
 const authorizeuser = require("../authorizeuser");
+const message = require("../database-models/message");
+const crypto = require("crypto");
 
 /* GET home page. */
 router.get("/", authorizeuser, function (req, res, next) {
@@ -100,6 +102,7 @@ router.get(
         id: messages[i]._id,
       });
     }
+    console.log(listtosend);
     res.json(listtosend);
   })
 );
@@ -126,8 +129,105 @@ router.delete(
   "/message",
   authorizeuser,
   asynchandler(async (req, res) => {
-    const item = await DirectMessage.findOne({ id: req.body.messsageid });
-    console.log(item);
+    let messagetodelete = {};
+    const item = await DirectMessage.findOne({ _id: req.body.threadid });
+    for (i = 0; i < item.messages.length; i++) {
+      if (item.messages[i].id == req.body.messageid) {
+        console.log("hey");
+        item.messages.splice(i, 1);
+        await item.save();
+      }
+    }
+    res.json(req.body.messageid);
+  })
+);
+
+router.get(
+  "/users",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    let messagetosend = [];
+    const users = await User.find();
+    users.forEach((user) => {
+      messagetosend.push({
+        username: user.username,
+        id: user._id,
+      });
+    });
+    console.log(messagetosend);
+    res.json(messagetosend);
+  })
+);
+router.post(
+  "/firstmessage",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+    const otheruser = await User.findById(req.body.otheruser);
+    let alreadychat = await DirectMessage.findOne({
+      users: { $all: [req.body.otheruser, req.user._id] },
+    });
+    if (req.body.otheruser == req.user._id) {
+      alreadychat = await DirectMessage.findOne({
+        users: [req.user._id, req.user._id],
+      });
+      if (!user.messages.includes(alreadychat._id)) {
+        user.messages.push(alreadychat._id);
+        await user.save();
+      }
+    }
+    if (alreadychat != null) {
+      const a = crypto.randomUUID();
+      alreadychat.messages.push({
+        message: req.body.message,
+        user: req.user._id,
+        id: a,
+        username: req.user.username,
+      });
+      if (!user.messages.includes(alreadychat._id)) {
+        user.messages.push(alreadychat._id);
+        await user.save();
+      }
+      await alreadychat.save();
+    } else {
+      const a = crypto.randomUUID();
+      const newchat = new DirectMessage({
+        users: [req.user._id, req.body.otheruser],
+        messages: [
+          {
+            message: req.body.message,
+            user: req.user._id,
+            id: a,
+            username: req.user.username,
+          },
+        ],
+      });
+      await newchat.save();
+      const chatid = await DirectMessage.findOne({
+        users: [req.user._id, req.body.otheruser],
+      });
+      user.messages.push(chatid._id);
+      otheruser.messages.push(chatid._id);
+      await user.save();
+      await otheruser.save();
+    }
+
+    res.json(200);
+  })
+);
+
+router.delete(
+  "/closedm",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+    user.messages.forEach((message, index) => {
+      if (message == req.body.messageid) {
+        user.messages.splice(index, 1);
+      }
+    });
+    await user.save();
+    res.json(200);
   })
 );
 
