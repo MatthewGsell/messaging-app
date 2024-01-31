@@ -1,6 +1,6 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import Channel from "./mainpages/Channel";
+import Server from "./mainpages/Server";
 import Home from "./mainpages/Home";
 import Login from "./mainpages/Login";
 import Messages from "./mainpages/Messages";
@@ -10,7 +10,9 @@ import Newmessage from "./mainpages/Newmessage";
 function App() {
   return (
     <Routes>
-      <Route path="/channel" element={<Channel />} />
+      <Route path="/server">
+        <Route path=":id" element={<Server />}/>
+      </Route>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/messages" element={<Messages />} />

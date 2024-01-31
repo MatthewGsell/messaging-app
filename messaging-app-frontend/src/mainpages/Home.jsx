@@ -8,7 +8,7 @@ function Home() {
   let messageRender = [];
   let directMessageRender = [];
   let sendbar = [];
-  const messsagetext = useRef();
+  const messagetext = useRef();
 
   useEffect(() => {
     isloggedin();
@@ -41,7 +41,7 @@ function Home() {
     serverList.forEach((server) => {
       const a = crypto.randomUUID();
       serverRender.push(
-        <div key={a}>
+        <div key={a} className="servericon" onClick={() => {navigate('/server/' + server.id)}}>
           {server.name.charAt(0)}
           {server.name.charAt(1)}
         </div>
@@ -73,7 +73,7 @@ function Home() {
             className="dmusernames"
             onClick={changemessagethread}
           >
-            <span>{otheruser}</span>
+            {otheruser}
           </div>
         );
       });
@@ -83,27 +83,24 @@ function Home() {
     messageList.forEach((thread) => {
       if (thread.id === e.target.id) {
         setMessageThread(thread);
-        const button = e.target.firstChild;
-        button.classList.add("visible");
       }
     });
   }
 
   function rendermessagethread() {
-    const keytwo = crypto.randomUUID();
-    const keythree = crypto.randomUUID();
+   ;
     if (messageThread != null) {
       messageThread["messages"].forEach((message) => {
         let deletebutton = null;
-        const keyone = crypto.randomUUID();
+       
         let name = "directmessage";
         if (messageThread["otheruser"] == message.username) {
           name = "directmessage otheruser";
         } else {
-          const keyfour = crypto.randomUUID();
+      
           deletebutton = [
             <button
-              key={keyfour}
+              key={crypto.randomUUID()}
               className="deletemessagebutton"
               onClick={deletemessage}
             >
@@ -112,7 +109,7 @@ function Home() {
           ];
         }
         directMessageRender.push(
-          <div id={message.id} className={name} key={keyone}>
+          <div id={message.id} className={name} key={crypto.randomUUID()}>
             <div className="individualmessage">{message.message}</div>
             <div className="directusername">
               <div>{message.username}</div>
@@ -122,11 +119,11 @@ function Home() {
         );
       });
       sendbar = [
-        <div key={keytwo} id="sendmessagebar">
+        <div key={crypto.randomUUID()} id="sendmessagebar">
           <button id="closethreadbutton" onClick={closedm}>
-            Close DM
+            Close Thread
           </button>
-          <textarea id="messagetext" ref={messsagetext}></textarea>
+          <textarea id="messagetext" ref={messagetext}></textarea>
           <button id="messagesendbutton" onClick={sendmessage}>
             Send
           </button>
@@ -134,9 +131,13 @@ function Home() {
       ];
     } else {
       directMessageRender = [
-        <h1 id="nomessagesopened" key={keythree}>
-          No Messages Opened
+        <h1 className="nothingopened" key={crypto.randomUUID()}>
+          Click a Message Thread to View Direct Messages
         </h1>,
+        <h1 key={crypto.randomUUID()} className="nothingopened">Click a Server to Open Server</h1>,
+        <h3 key={crypto.randomUUID()} className="nothingopened">Clicking on the server bar while a message thread is open will back you out of the message thread</h3>,
+        <h3 key={crypto.randomUUID()} className="nothingopened">Closing a message thread does not delete it. If you send a new message to that same person the thread will be reopened between you and the other user. It also does not close the thread for them</h3>,
+        <h4 key={crypto.randomUUID()} className="nothingopened">If both users close the message thread however it will be deleted.</h4>
       ];
     }
   }
@@ -154,7 +155,7 @@ function Home() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        message: messsagetext.current.value,
+        message: messagetext.current.value,
         id: messageThread.id,
         messageid: a,
       }),
@@ -164,7 +165,7 @@ function Home() {
     getmessages();
 
     messageThread["messages"].push({
-      message: messsagetext.current.value,
+      message: messagetext.current.value,
       user: c.id,
       id: a,
       username: c.username,
@@ -218,7 +219,7 @@ function Home() {
       </div>
       <div id="directmessagescontainer">
         <div id="directmessages">
-          <p>Direct Messages</p>
+          <p>Open Message Threads</p>
           {messageRender}
         </div>
         <div id="addmessagecontainer">

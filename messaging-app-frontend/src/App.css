@@ -270,7 +270,7 @@ a {
   border-bottom: 1px solid black;
   border-radius: 10px;
 }
-#nomessagesopened {
+.nothingopened {
   text-align: center;
   margin-top: 2%;
   font-family: "Lilita One", sans-serif;
@@ -425,4 +425,24 @@ a {
 #messagesendbox > button:hover {
   transform: scale(1.1);
   cursor: pointer;
+}
+
+/*channel specific styles*/
+
+.selectedserver {
+  border: 10px solid #bbb8b269;
+}
+
+.channelnames {
+  font-size: xx-large;
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+.channelnames:hover {
+  background-color: #1f1f1f;
+  transform: scale(1.1);
+  border: black solid 1px;
+  border-radius: 5px;
 }

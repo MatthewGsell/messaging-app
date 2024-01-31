@@ -5,6 +5,7 @@ const serverSchema = mongoose.Schema({
   users: { type: Array, required: true },
   channels: { type: Array, required: true, default: [] },
   voice_channels: { type: Array, required: true, default: [] },
+  owner: {type: String, required: true}
 });
 
 module.exports = mongoose.model("Server", serverSchema);
