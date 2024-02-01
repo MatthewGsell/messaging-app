@@ -446,3 +446,37 @@ a {
   border: black solid 1px;
   border-radius: 5px;
 }
+
+#newchannelbox {
+  display: flex;
+  position: absolute;
+  background-color: #bbb8b2;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  width: 400px;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  top: 50%;
+  left: 45%;
+}
+#newchannelbox > button {
+  height: 40%;
+  width: 20%;
+  margin-left: 4%;
+  background-image: linear-gradient(
+    to right bottom,
+    #d00000,
+    #a70038,
+    #6b0c45,
+    #301834,
+    #0a0a0a
+  );
+  border-radius: 5px;
+  color: white;
+  font-size: larger;
+}
+#newchannelbox > input {
+  height: 40%;
+  border-radius: 5px;
+}

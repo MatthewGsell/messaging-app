@@ -41,7 +41,13 @@ function Home() {
     serverList.forEach((server) => {
       const a = crypto.randomUUID();
       serverRender.push(
-        <div key={a} className="servericon" onClick={() => {navigate('/server/' + server.id)}}>
+        <div
+          key={a}
+          className="servericon"
+          onClick={() => {
+            navigate("/server/" + server.id);
+          }}
+        >
           {server.name.charAt(0)}
           {server.name.charAt(1)}
         </div>
@@ -88,16 +94,14 @@ function Home() {
   }
 
   function rendermessagethread() {
-   ;
     if (messageThread != null) {
       messageThread["messages"].forEach((message) => {
         let deletebutton = null;
-       
+
         let name = "directmessage";
         if (messageThread["otheruser"] == message.username) {
           name = "directmessage otheruser";
         } else {
-      
           deletebutton = [
             <button
               key={crypto.randomUUID()}
@@ -134,10 +138,21 @@ function Home() {
         <h1 className="nothingopened" key={crypto.randomUUID()}>
           Click a Message Thread to View Direct Messages
         </h1>,
-        <h1 key={crypto.randomUUID()} className="nothingopened">Click a Server to Open Server</h1>,
-        <h3 key={crypto.randomUUID()} className="nothingopened">Clicking on the server bar while a message thread is open will back you out of the message thread</h3>,
-        <h3 key={crypto.randomUUID()} className="nothingopened">Closing a message thread does not delete it. If you send a new message to that same person the thread will be reopened between you and the other user. It also does not close the thread for them</h3>,
-        <h4 key={crypto.randomUUID()} className="nothingopened">If both users close the message thread however it will be deleted.</h4>
+        <h1 key={crypto.randomUUID()} className="nothingopened">
+          Click a Server to Open Server
+        </h1>,
+        <h3 key={crypto.randomUUID()} className="nothingopened">
+          Clicking on the server bar while a message thread is open will back
+          you out of the message thread
+        </h3>,
+        <h3 key={crypto.randomUUID()} className="nothingopened">
+          Closing a message thread does not delete it. If you send a new message
+          to that same person the thread will be reopened between you and the
+          other user. It also does not close the thread for them
+        </h3>,
+        <h4 key={crypto.randomUUID()} className="nothingopened">
+          If both users close the message thread however it will be deleted.
+        </h4>,
       ];
     }
   }

@@ -231,56 +231,95 @@ router.delete(
   })
 );
 
-router.get('/channels:serverid', authorizeuser, asynchandler(async (req, res) => {
-  const server = await Server.findById(req.params.serverid)
-  res.json({
-    channels: server.channels,
-    voice_channels: server.voice_channels
+router.get(
+  "/channels:serverid",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const server = await Server.findById(req.params.serverid);
+    res.json({
+      channels: server.channels,
+      voice_channels: server.voice_channels,
+    });
   })
-}))
+);
 
-router.get('/user', authorizeuser, asynchandler(async (req, res) => {
-  res.json(req.user)
-}))
+router.get(
+  "/user",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    res.json(req.user);
+  })
+);
 
-
-router.delete('/channelmessage:id', authorizeuser, asynchandler(async (req, res) => {
-  
+router.delete(
+  "/channelmessage:id",
+  authorizeuser,
+  asynchandler(async (req, res) => {
     const server = await Server.findOne({ _id: req.params.id });
-    for(let i = 0; i < server.channels.length; i++) {
+    for (let i = 0; i < server.channels.length; i++) {
       if (server.channels[i].id == req.body.channel) {
-        console.log('yo')
+        console.log("yo");
         for (let o = 0; o < server.channels[i].messages.length; o++) {
-          if(server.channels[i].messages[o].id == req.body.messageid) {
-            console.log(server.channels[i].messages[o])
-            server.channels[i].messages.splice(o, 1)
-           await Server.findByIdAndUpdate(req.params.id, {channels: server.channels})
-            
+          if (server.channels[i].messages[o].id == req.body.messageid) {
+            console.log(server.channels[i].messages[o]);
+            server.channels[i].messages.splice(o, 1);
+            await Server.findByIdAndUpdate(req.params.id, {
+              channels: server.channels,
+            });
           }
         }
       }
     }
-  res.json(req.body.messageid)
+    res.json(req.body.messageid);
+  })
+);
 
-}))
-
-router.post("/channelmessage:id", authorizeuser, asynchandler(async (req, res) => {
-  const server = await Server.findOne({ _id: req.params.id });
-  for(let i = 0; i < server.channels.length; i++) {
-    if (server.channels[i].id == req.body.channel_id) {
-      server.channels[i].messages.push({
-        message: req.body.message,
-        user: req.user.username,
-        id: req.body.messageid
-      })
-      await Server.findByIdAndUpdate(req.params.id, {channels: server.channels})
+router.post(
+  "/channelmessage:id",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const server = await Server.findOne({ _id: req.params.id });
+    for (let i = 0; i < server.channels.length; i++) {
+      if (server.channels[i].id == req.body.channel_id) {
+        server.channels[i].messages.push({
+          message: req.body.message,
+          user: req.user.username,
+          id: req.body.messageid,
+        });
+        await Server.findByIdAndUpdate(req.params.id, {
+          channels: server.channels,
+        });
+      }
     }
-  }
-res.json(req.body.messageid)
-}))
+    res.json(req.body.messageid);
+  })
+);
+router.post(
+  "/addchannel:serverid",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const a = await Server.findByIdAndUpdate(req.params.serverid, {
+      $push: {
+        channels: {
+          name: req.body.channelname,
+          messages: [],
+          id: req.body.channel_id,
+        },
+      },
+    });
 
-
-
-
+    res.json(200);
+  })
+);
+router.get(
+  "/isowner:id",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const server = await Server.findById(req.params.id);
+    if (req.user._id == server.owner) {
+      res.json({ value: "true" });
+    }
+  })
+);
 
 module.exports = router;
