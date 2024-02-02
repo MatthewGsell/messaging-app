@@ -322,4 +322,55 @@ router.get(
   })
 );
 
+router.delete(
+  "/channel:serverid",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const server = await Server.findById(req.params.serverid);
+    for (let i = 0; i < server.channels.length; i++) {
+      if (server.channels[i].id == req.body.channel_id) {
+        server.channels.splice(i, 1);
+        await server.save();
+      }
+    }
+    res.json(200);
+  })
+);
+
+router.put(
+  "/channel:serverid",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const server = await Server.findById(req.params.serverid);
+    for (let i = 0; i < server.channels.length; i++) {
+      if (server.channels[i].id == req.body.channel_id) {
+        const newchannel = server.channels[i];
+        newchannel.name = req.body.name;
+        server.channels.splice(i, 1, newchannel);
+        await server.save();
+      }
+    }
+    res.json(200);
+  })
+);
+
+router.post(
+  "/server",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const server = new Server({
+      name: req.body.servername,
+      users: [req.user._id],
+      channels: [],
+      voice_channels: [],
+      owner: req.user._id,
+    });
+    await server.save();
+    const user = await User.findById(req.user._id);
+    user.servers.push(server._id);
+    await user.save();
+    res.json(200);
+  })
+);
+
 module.exports = router;

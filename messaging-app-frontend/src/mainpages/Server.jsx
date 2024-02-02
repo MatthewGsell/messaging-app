@@ -14,11 +14,13 @@ function Server() {
   const [newChannelBox, setNewChannelBox] = useState([]);
   const [newChannelButton, setNewChannelButton] = useState([]);
   const [channelSettingsBox, setChannelSettingsBox] = useState([]);
+  const [newServerBox, setNewServerBox] = useState([]);
   const messagetext = useRef();
   let serverRender = [];
   let channelRender = [];
   let channelMessageRender = [];
   let sendbar = [];
+  let selectedserver = null;
   const navigate = useNavigate();
   useEffect(() => {
     getservers();
@@ -29,6 +31,17 @@ function Server() {
   renderservers();
   renderchannels();
   renderchannelmessages();
+  selectserver();
+
+  function selectserver() {
+    serverList.forEach((server) => {
+      console.log(server);
+      if (server.id == serverid.id) {
+        selectedserver = server.name.toUpperCase();
+      }
+    });
+  }
+
   async function renderaddchannelbutton() {
     const a = await fetch(`http://localhost:3000/isowner${serverid.id}`, {
       method: "GET",
@@ -53,7 +66,6 @@ function Server() {
       ]);
     }
   }
-  async function deletechannel() {}
 
   async function getcurrentuser() {
     const a = await fetch("http://localhost:3000/user", {
@@ -117,6 +129,7 @@ function Server() {
             className="channelnames"
             onClick={openchannel}
             onContextMenu={async (e) => {
+              const channelid = e.target.id;
               e.preventDefault();
               const a = await fetch(
                 `http://localhost:3000/isowner${serverid.id}`,
@@ -129,8 +142,30 @@ function Server() {
               if (isowner.value == "true") {
                 setChannelSettingsBox([
                   <div key={crypto.randomUUID()} id="channelsettingsbox">
-                    <button>Change Channel Name</button>
-                    <button>Delete Channel</button>
+                    <h3>{e.target.textContent}</h3>
+                    <div>
+                      <button
+                        onClick={() => {
+                          deletechannel(channelid);
+                        }}
+                      >
+                        Delete Channel
+                      </button>
+                      <button
+                        onClick={() => {
+                          changechannelname(channelid);
+                        }}
+                      >
+                        Change Name
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setChannelSettingsBox([]);
+                      }}
+                    >
+                      ❌
+                    </button>
                   </div>,
                 ]);
               }
@@ -192,23 +227,12 @@ function Server() {
     } else {
       channelMessageRender = [
         <h1 className="nothingopened" key={crypto.randomUUID()}>
-          Click a Message Thread to View Direct Messages
+          Click a Channel to View Group Messages
         </h1>,
         <h1 key={crypto.randomUUID()} className="nothingopened">
-          Click a Server to Open Server
+          Right Click a Channel to Change its Name or Delete it if You are the
+          Owner
         </h1>,
-        <h3 key={crypto.randomUUID()} className="nothingopened">
-          Clicking on the server bar while a message thread is open will back
-          you out of the message thread
-        </h3>,
-        <h3 key={crypto.randomUUID()} className="nothingopened">
-          Closing a message thread does not delete it. If you send a new message
-          to that same person the thread will be reopened between you and the
-          other user. It also does not close the thread for them
-        </h3>,
-        <h4 key={crypto.randomUUID()} className="nothingopened">
-          If both users close the message thread however it will be deleted.
-        </h4>,
       ];
       console.log(channelMessageRender);
     }
@@ -241,6 +265,7 @@ function Server() {
       }
     });
   }
+
   async function sendmessage() {
     const a = crypto.randomUUID();
     await fetch(`http://localhost:3000/channelmessage${serverid.id}`, {
@@ -284,23 +309,91 @@ function Server() {
     location.reload();
   }
 
+  async function deletechannel(channelid) {
+    await fetch(`http://localhost:3000/channel${serverid.id}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        channel_id: channelid,
+      }),
+    });
+    location.reload();
+  }
+
+  async function changechannelname(channelid) {
+    let a = prompt("enter new channel name:");
+    if (a == "") {
+      a = "####";
+    }
+    await fetch(`http://localhost:3000/channel${serverid.id}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        channel_id: channelid,
+        name: a,
+      }),
+    });
+    location.reload();
+  }
+  async function newserver(e) {
+    await fetch(`http://localhost:3000/server`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        servername: e.target.previousSibling.value,
+      }),
+    });
+    location.reload();
+  }
+
   return (
     <div id="homecontainer">
       {newChannelBox}
+      {newServerBox}
       {channelSettingsBox}
-      <div id="serverbar">
+      <div id="serverbarcontainer">
         <p>Servers</p>
-        {serverRender}
+        <div id="serverbar">{serverRender}</div>
+        <button
+          id="addserverbutton"
+          onClick={() => {
+            setNewServerBox([
+              <div key={crypto.randomUUID()} id="newserverbox">
+                <input placeholder="server name"></input>
+                <button onClick={newserver}>Add</button>
+              </div>,
+            ]);
+          }}
+        >
+          New Server
+        </button>
       </div>
       <div id="directmessagescontainer">
-        <div id="directmessages">
-          <p>Channels</p>
-          {channelRender}
+        <p>Channels</p>
+        <div id="directmessages">{channelRender}</div>
+        <div id="addmessagecontainer">
+          {newChannelButton}
+          <button
+            onClick={() => {
+              navigate("/");
+            }}
+          >
+            Home
+          </button>
         </div>
-        <div id="addmessagecontainer">{newChannelButton}</div>
       </div>
 
       <div id="directmessage">
+        <h1 id="servername">{selectedserver}</h1>
         <div id="individualmessage">{channelMessageRender}</div>
         {sendbar}
       </div>

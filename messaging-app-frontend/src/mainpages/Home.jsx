@@ -4,20 +4,44 @@ function Home() {
   const [serverList, setServerList] = useState([]);
   const [messageList, setMessageList] = useState([]);
   const [messageThread, setMessageThread] = useState(null);
+  const [newServerBox, setNewServerBox] = useState([]);
+  const [directMessageRender, setDirectMessageRender] = useState([]);
+  const [sendBar, setSendBar] = useState([]);
+  const [render, setRender] = useState(false);
+  const [focused, setFocused] = useState(false);
   let serverRender = [];
   let messageRender = [];
-  let directMessageRender = [];
-  let sendbar = [];
+  let a = null;
   const messagetext = useRef();
 
   useEffect(() => {
     isloggedin();
     getservers();
     getmessages();
-  }, []);
+    renderservers();
+    rendermessages();
+    rendermessagethread();
+    reloadmessagethread();
+
+    const interval = setInterval(reload, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [messageThread, render, focused]);
+
   renderservers();
   rendermessages();
-  rendermessagethread();
+  function reload() {
+    if (focused == false) {
+      if (render == false) {
+        setRender(true);
+      } else {
+        setRender(false);
+      }
+    }
+  }
+
   const navigate = useNavigate();
   async function isloggedin() {
     const a = await fetch("http://localhost:3000/", {
@@ -92,8 +116,16 @@ function Home() {
       }
     });
   }
+  async function reloadmessagethread() {
+    messageList.forEach((thread) => {
+      if (thread.id == messageThread.id) {
+        setMessageThread(thread);
+      }
+    });
+  }
 
   function rendermessagethread() {
+    let newmessagerender = [];
     if (messageThread != null) {
       messageThread["messages"].forEach((message) => {
         let deletebutton = null;
@@ -112,7 +144,7 @@ function Home() {
             </button>,
           ];
         }
-        directMessageRender.push(
+        newmessagerender.push(
           <div id={message.id} className={name} key={crypto.randomUUID()}>
             <div className="individualmessage">{message.message}</div>
             <div className="directusername">
@@ -122,19 +154,27 @@ function Home() {
           </div>
         );
       });
-      sendbar = [
+      setDirectMessageRender(newmessagerender);
+      setSendBar([
         <div key={crypto.randomUUID()} id="sendmessagebar">
           <button id="closethreadbutton" onClick={closedm}>
             Close Thread
           </button>
-          <textarea id="messagetext" ref={messagetext}></textarea>
+          <textarea
+            id="messagetext"
+            ref={messagetext}
+            onFocus={() => {
+              clearInterval(a);
+              setFocused(true);
+            }}
+          ></textarea>
           <button id="messagesendbutton" onClick={sendmessage}>
             Send
           </button>
         </div>,
-      ];
+      ]);
     } else {
-      directMessageRender = [
+      setDirectMessageRender([
         <h1 className="nothingopened" key={crypto.randomUUID()}>
           Click a Message Thread to View Direct Messages
         </h1>,
@@ -153,12 +193,12 @@ function Home() {
         <h4 key={crypto.randomUUID()} className="nothingopened">
           If both users close the message thread however it will be deleted.
         </h4>,
-      ];
+      ]);
     }
   }
 
   function clickoutsidemessage() {
-    setMessageThread(null);
+    location.reload();
   }
 
   async function sendmessage() {
@@ -175,19 +215,12 @@ function Home() {
         messageid: a,
       }),
     });
-    const c = await b.json();
 
-    getmessages();
-
-    messageThread["messages"].push({
-      message: messagetext.current.value,
-      user: c.id,
-      id: a,
-      username: c.username,
-    });
+    setFocused(false);
   }
 
   async function deletemessage(e) {
+    e.target.classList.add("beingdeleted");
     const itemtodelete = e.target.parentElement.parentElement.id;
     const a = await fetch("http://localhost:3000/message", {
       method: "DELETE",
@@ -226,11 +259,40 @@ function Home() {
     window.location.reload();
   }
 
+  async function newserver(e) {
+    await fetch(`http://localhost:3000/server`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        servername: e.target.previousSibling.value,
+      }),
+    });
+    location.reload();
+  }
+
   return (
     <div id="homecontainer">
-      <div id="serverbar" onClick={clickoutsidemessage}>
+      {newServerBox}
+      <div onClick={clickoutsidemessage} id="serverbarcontainer">
         <p>Servers</p>
-        {serverRender}
+        <div id="serverbar">{serverRender}</div>
+        <button
+          id="addserverbutton"
+          onClick={(e) => {
+            setNewServerBox([
+              <div key={crypto.randomUUID()} id="newserverbox">
+                <input placeholder="server name"></input>
+                <button onClick={newserver}>Add</button>
+              </div>,
+            ]);
+            e.stopPropagation();
+          }}
+        >
+          New Server
+        </button>
       </div>
       <div id="directmessagescontainer">
         <div id="directmessages">
@@ -250,7 +312,7 @@ function Home() {
 
       <div id="directmessage">
         <div id="individualmessage">{directMessageRender}</div>
-        {sendbar}
+        {sendBar}
       </div>
     </div>
   );
