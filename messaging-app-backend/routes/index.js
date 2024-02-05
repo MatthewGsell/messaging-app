@@ -121,7 +121,7 @@ router.post(
         },
       },
     });
-    res.json({ username: req.user.username, id: req.user._id });
+    res.json({ username: req.user.username, id: req.body.messageid });
   })
 );
 
@@ -372,5 +372,16 @@ router.post(
     res.json(200);
   })
 );
+
+router.put("/server:id", authorizeuser, asynchandler(async (req, res) => {
+  await Server.findByIdAndUpdate(req.params.id, {name: req.body.name})
+  res.json(200)
+}))
+
+router.delete('/server:id', authorizeuser, asynchandler(async (req, res) => {
+  await Server.findByIdAndDelete(req.params.id)
+  res.json(200)
+}))
+
 
 module.exports = router;

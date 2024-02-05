@@ -9,9 +9,10 @@ function Home() {
   const [sendBar, setSendBar] = useState([]);
   const [render, setRender] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [serverSettingsBox, setServerSettingsBox] = useState([])
   let serverRender = [];
   let messageRender = [];
-  let a = null;
+
   const messagetext = useRef();
 
   useEffect(() => {
@@ -21,14 +22,25 @@ function Home() {
     renderservers();
     rendermessages();
     rendermessagethread();
-    reloadmessagethread();
+  
 
-    const interval = setInterval(reload, 1000);
+    const interval = setInterval(reload, 5000);
 
     return () => {
       clearInterval(interval);
+      reload()
     };
   }, [messageThread, render, focused]);
+
+  focustextbox()
+
+
+  function focustextbox() {
+    if (focused == true) {
+      const textbox = document.querySelector('textarea')
+      textbox.focus()
+    }
+  }
 
   renderservers();
   rendermessages();
@@ -40,6 +52,7 @@ function Home() {
         setRender(false);
       }
     }
+    
   }
 
   const navigate = useNavigate();
@@ -67,10 +80,53 @@ function Home() {
       serverRender.push(
         <div
           key={a}
+          id={server.id}
           className="servericon"
           onClick={() => {
             navigate("/server/" + server.id);
           }}
+          onContextMenu={async (e) => {
+            const id = e.target.id  
+              e.preventDefault();
+              const a = await fetch(
+                `http://localhost:3000/isowner${id}`,
+                {
+                  method: "GET",
+                  credentials: "include",
+                }
+              );
+              const isowner = await a.json();
+              if (isowner.value == "true") {
+                setServerSettingsBox([
+                  <div key={crypto.randomUUID()} id="channelsettingsbox">
+                    <h3>{e.target.textContent}</h3>
+                    <div>
+                      <button
+                        onClick={() => {
+                          deleteserver(id);
+                        }}
+                      >
+                        Delete Server
+                      </button>
+                      <button
+                        onClick={() => {
+                          changeservername(id);
+                        }}
+                      >
+                        Change Name
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setServerSettingsBox([]);
+                      }}
+                    >
+                      ❌
+                    </button>
+                  </div>,
+                ]);
+              }
+            }}
         >
           {server.name.charAt(0)}
           {server.name.charAt(1)}
@@ -164,9 +220,9 @@ function Home() {
             id="messagetext"
             ref={messagetext}
             onFocus={() => {
-              clearInterval(a);
               setFocused(true);
             }}
+           
           ></textarea>
           <button id="messagesendbutton" onClick={sendmessage}>
             Send
@@ -215,8 +271,15 @@ function Home() {
         messageid: a,
       }),
     });
-
+    const c = await b.json()
+    messageThread['messages'].push({
+      message: messagetext.current.value,
+          id: c.id,
+          username: c.username,
+    })
+    messagetext.current.value = ''
     setFocused(false);
+    
   }
 
   async function deletemessage(e) {
@@ -240,8 +303,13 @@ function Home() {
       console.log(b);
       if (message.id == b) {
         messageThread["messages"].splice(index, 1);
-      }
+      } 
     });
+    if (render == true) {
+      setRender(false)
+    } else {
+      setRender(true)
+    }
   }
 
   async function closedm() {
@@ -273,9 +341,37 @@ function Home() {
     location.reload();
   }
 
+  async function deleteserver(id) {
+    await fetch(`http://localhost:3000/server${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    location.reload()
+  }
+
+  
+  async function changeservername (id) {
+    let a = prompt("enter new server name:");
+    if (a == "") {
+      a = "####";
+    }
+    await fetch(`http://localhost:3000/server${id}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: a,
+      }),
+    });
+    location.reload();
+  }
+
   return (
     <div id="homecontainer">
       {newServerBox}
+      {serverSettingsBox}
       <div onClick={clickoutsidemessage} id="serverbarcontainer">
         <p>Servers</p>
         <div id="serverbar">{serverRender}</div>

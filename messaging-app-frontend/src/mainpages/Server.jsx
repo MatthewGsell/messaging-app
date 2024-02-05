@@ -15,11 +15,14 @@ function Server() {
   const [newChannelButton, setNewChannelButton] = useState([]);
   const [channelSettingsBox, setChannelSettingsBox] = useState([]);
   const [newServerBox, setNewServerBox] = useState([]);
+  const [serverSettingsBox, setServerSettingsBox] = useState([])
+  const [channelMessageRender, setChannelMessageRender] = useState([])
+  const [sendBar, setSendBar] = useState([]);
+  const [render, setRender] = useState(false)
+  const [focused, setFocused] = useState(false);
   const messagetext = useRef();
   let serverRender = [];
   let channelRender = [];
-  let channelMessageRender = [];
-  let sendbar = [];
   let selectedserver = null;
   const navigate = useNavigate();
   useEffect(() => {
@@ -27,11 +30,44 @@ function Server() {
     getchannels();
     getcurrentuser();
     renderaddchannelbutton();
-  }, []);
+    renderchannelmessages();
+
+    const interval = setInterval(reload, 5000);
+
+    return () => {
+      clearInterval(interval);
+      reload()
+    };
+  }, [selectedChannel, focused, render]);
+  focustextbox()
   renderservers();
   renderchannels();
-  renderchannelmessages();
+
   selectserver();
+  
+ 
+
+
+  function focustextbox() {
+    if (focused == true) {
+      const textbox = document.querySelector('textarea')
+      textbox.focus()
+    }
+  }
+
+
+  function reload() {
+    if (focused == false) {
+      if (render == false) {
+        setRender(true);
+      } else {
+        setRender(false);
+      }
+    }
+    
+  }
+
+
 
   function selectserver() {
     serverList.forEach((server) => {
@@ -95,9 +131,52 @@ function Server() {
         <div
           key={a}
           className={serverclass}
+          id={server.id}
           onClick={() => {
             navigate("/server/" + server.id);
             location.reload();
+          }}
+          onContextMenu={async (e) => {
+          const id = e.target.id  
+            e.preventDefault();
+            const a = await fetch(
+              `http://localhost:3000/isowner${id}`,
+              {
+                method: "GET",
+                credentials: "include",
+              }
+            );
+            const isowner = await a.json();
+            if (isowner.value == "true") {
+              setServerSettingsBox([
+                <div key={crypto.randomUUID()} id="channelsettingsbox">
+                  <h3>{e.target.textContent}</h3>
+                  <div>
+                    <button
+                      onClick={() => {
+                        deleteserver(id);
+                      }}
+                    >
+                      Delete Server
+                    </button>
+                    <button
+                      onClick={() => {
+                        changeservername(id);
+                      }}
+                    >
+                      Change Name
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setServerSettingsBox([]);
+                    }}
+                  >
+                    ❌
+                  </button>
+                </div>,
+              ]);
+            }
           }}
         >
           {server.name.charAt(0)}
@@ -187,6 +266,7 @@ function Server() {
   }
 
   function renderchannelmessages() {
+    let newmessagerender = []
     if (selectedChannel != null) {
       selectedChannel["messages"].forEach((message) => {
         let deletebutton = null;
@@ -206,7 +286,8 @@ function Server() {
             </button>,
           ];
         }
-        channelMessageRender.push(
+       
+        newmessagerender.push(
           <div id={message.id} className={name} key={crypto.randomUUID()}>
             <div className="individualmessage">{message.message}</div>
             <div className="directusername">
@@ -216,16 +297,23 @@ function Server() {
           </div>
         );
       });
-      sendbar = [
+      setChannelMessageRender(newmessagerender)
+      setSendBar([
         <div key={crypto.randomUUID()} id="sendmessagebar">
-          <textarea id="messagetext" ref={messagetext}></textarea>
+          <textarea
+            id="messagetext"
+            ref={messagetext}
+            onFocus={() => {
+              setFocused(true);
+            }}
+          ></textarea>
           <button id="messagesendbutton" onClick={sendmessage}>
             Send
           </button>
         </div>,
-      ];
-    } else {
-      channelMessageRender = [
+      ]);
+    } else if(channelMessageRender.length == 0){
+      setChannelMessageRender([
         <h1 className="nothingopened" key={crypto.randomUUID()}>
           Click a Channel to View Group Messages
         </h1>,
@@ -233,7 +321,7 @@ function Server() {
           Right Click a Channel to Change its Name or Delete it if You are the
           Owner
         </h1>,
-      ];
+      ]) 
       console.log(channelMessageRender);
     }
   }
@@ -264,11 +352,16 @@ function Server() {
         selectedChannel["messages"].splice(index, 1);
       }
     });
+    if (render == true) {
+      setRender(false)
+    } else {
+      setRender(true)
+    }
   }
 
   async function sendmessage() {
     const a = crypto.randomUUID();
-    await fetch(`http://localhost:3000/channelmessage${serverid.id}`, {
+    const b = await fetch(`http://localhost:3000/channelmessage${serverid.id}`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -280,14 +373,15 @@ function Server() {
         messageid: a,
       }),
     });
-
-    getchannels();
+    const c = await b.json()
+    console.log(c)
 
     selectedChannel["messages"].push({
       message: messagetext.current.value,
       user: currentUser.username,
       id: a,
     });
+    setFocused(false)
   }
   async function addchannel(e) {
     let name = "####";
@@ -355,11 +449,38 @@ function Server() {
     location.reload();
   }
 
+  async function deleteserver(id) {
+    await fetch(`http://localhost:3000/server${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    navigate('/')
+  }
+
+  async function changeservername (id) {
+    let a = prompt("enter new server name:");
+    if (a == "") {
+      a = "####";
+    }
+    await fetch(`http://localhost:3000/server${id}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: a,
+      }),
+    });
+    location.reload();
+  }
+
   return (
     <div id="homecontainer">
       {newChannelBox}
       {newServerBox}
       {channelSettingsBox}
+      {serverSettingsBox}
       <div id="serverbarcontainer">
         <p>Servers</p>
         <div id="serverbar">{serverRender}</div>
@@ -395,7 +516,7 @@ function Server() {
       <div id="directmessage">
         <h1 id="servername">{selectedserver}</h1>
         <div id="individualmessage">{channelMessageRender}</div>
-        {sendbar}
+        {sendBar}
       </div>
     </div>
   );
