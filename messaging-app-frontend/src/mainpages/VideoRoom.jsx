@@ -10,6 +10,7 @@ function VideoRoom() {
   const [thisUser, setThisUser] = useState();
   const [channelInfo, setChannelInfo] = useState();
   const channel = useParams();
+  console.log(channel)
 
   useEffect(() => {
     if (channelInfo) {
@@ -99,7 +100,7 @@ function VideoRoom() {
     );
   }
 
-  function leavestream() {
+  function leavestream(user) {
     user.videoTrack.stop();
     user.videoTrack.close();
     user.audioTrack.stop();

@@ -298,15 +298,27 @@ router.post(
   "/addchannel:serverid",
   authorizeuser,
   asynchandler(async (req, res) => {
-    const a = await Server.findByIdAndUpdate(req.params.serverid, {
-      $push: {
-        channels: {
-          name: req.body.channelname,
-          messages: [],
-          id: req.body.channel_id,
+    if (req.body.channeltype === "text") {
+      const a = await Server.findByIdAndUpdate(req.params.serverid, {
+        $push: {
+          channels: {
+            name: req.body.channelname,
+            messages: [],
+            id: req.body.channel_id,
+          },
         },
-      },
-    });
+      });
+    } else {
+      const a = await Server.findByIdAndUpdate(req.params.serverid, {
+        $push: {
+          voice_channels: {
+            name: req.body.channelname,
+            id: req.body.channel_id,
+          },
+        },
+      });
+    }
+ 
 
     res.json(200);
   })
@@ -333,6 +345,12 @@ router.delete(
         await server.save();
       }
     }
+    for (let i = 0; i < server.voice_channels.length; i++) {
+      if (server.voice_channels[i].id == req.body.channel_id) {
+        server.voice_channels.splice(i, 1);
+        await server.save();
+      }
+    }
     res.json(200);
   })
 );
@@ -348,8 +366,15 @@ router.put(
         newchannel.name = req.body.name;
         server.channels.splice(i, 1, newchannel);
         await server.save();
-      }
-    }
+      } 
+    } for (let i = 0; i < server.voice_channels.length; i++) {
+      if (server.voice_channels[i].id == req.body.channel_id) {
+        const newchannel = server.voice_channels[i];
+        newchannel.name = req.body.name;
+        server.voice_channels.splice(i, 1, newchannel);
+        await server.save();
+      } 
+    } 
     res.json(200);
   })
 );

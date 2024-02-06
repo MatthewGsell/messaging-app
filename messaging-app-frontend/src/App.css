@@ -485,8 +485,8 @@ a {
   background-color: #bbb8b2;
   align-items: center;
   justify-content: center;
-  height: 100px;
-  width: 400px;
+  height: 130px;
+  width: 600px;
   border-radius: 10px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   top: 50%;
@@ -510,6 +510,7 @@ a {
 }
 #newchannelbox > input {
   height: 40%;
+  width: 40%;
   border-radius: 5px;
 }
 
@@ -665,4 +666,33 @@ a {
 
 #stream-controls > button.muted {
   background-color: #d00000;
+}
+
+#channelsrender {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 50%;
+  width: 100%;
+
+  overflow-y: scroll;
+
+}
+#channelsrender::-webkit-scrollbar {
+  display: none;
+}
+
+#voicechannelrender {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 25%;
+  width: 100%;
+
+  overflow-y: scroll;
+
+}
+
+#voicechannelrender::-webkit-scrollbar {
+  display: none;
 }

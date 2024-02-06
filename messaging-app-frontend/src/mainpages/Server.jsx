@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { render } from "react-dom";
@@ -87,7 +87,8 @@ function Server() {
             setNewChannelBox(
               <div key={crypto.randomUUID()} id="newchannelbox">
                 <input placeholder="channel name"></input>
-                <button onClick={addchannel}>Add</button>
+                <button onClick={addchannel}>Text Channel</button>
+                <button onClick={addvoicechannel}>Voice Channel</button>
               </div>
             );
           }}
@@ -255,6 +256,7 @@ function Server() {
         const a = crypto.randomUUID();
 
         voicechannelrender.push(
+          <Link to={`/videoroom/${channel.id}`}>
           <div
             key={a}
             id={channel.id}
@@ -304,6 +306,7 @@ function Server() {
           >
             {channel.name}
           </div>
+          </Link>
         );
       });
     }
@@ -452,11 +455,36 @@ function Server() {
       body: JSON.stringify({
         channelname: name,
         channel_id: crypto.randomUUID(),
+        channeltype: "text"
       }),
     });
     setNewChannelBox([]);
     location.reload();
   }
+
+
+  async function addvoicechannel(e) {
+    let name = "####";
+    if (e.target.previousSibling.previousSibling.value != "") {
+      name = e.target.previousSibling.previousSibling.value;
+    }
+    await fetch(`http://localhost:3000/addchannel${serverid.id}`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        channelname: name,
+        channel_id: crypto.randomUUID(),
+        channeltype: "voice"
+      }),
+    });
+    setNewChannelBox([]);
+    location.reload();
+  }
+
+
 
   async function deletechannel(channelid) {
     await fetch(`http://localhost:3000/channel${serverid.id}`, {
@@ -555,7 +583,8 @@ function Server() {
       </div>
       <div id="directmessagescontainer">
         <p>Channels</p>
-        <div id="directmessages">{channelRender}</div>
+        <div id="channelsrender">{channelRender}</div>
+        <p>Voice Channels</p>
         <div id="voicechannelrender">{voicechannelrender}</div>
         <div id="addmessagecontainer">
           {newChannelButton}
