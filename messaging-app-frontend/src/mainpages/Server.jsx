@@ -15,15 +15,17 @@ function Server() {
   const [newChannelButton, setNewChannelButton] = useState([]);
   const [channelSettingsBox, setChannelSettingsBox] = useState([]);
   const [newServerBox, setNewServerBox] = useState([]);
-  const [serverSettingsBox, setServerSettingsBox] = useState([])
-  const [channelMessageRender, setChannelMessageRender] = useState([])
+  const [serverSettingsBox, setServerSettingsBox] = useState([]);
+  const [channelMessageRender, setChannelMessageRender] = useState([]);
   const [sendBar, setSendBar] = useState([]);
-  const [render, setRender] = useState(false)
+  const [render, setRender] = useState(false);
   const [focused, setFocused] = useState(false);
   const messagetext = useRef();
   let serverRender = [];
   let channelRender = [];
+  let voicechannelrender = [];
   let selectedserver = null;
+
   const navigate = useNavigate();
   useEffect(() => {
     getservers();
@@ -36,25 +38,21 @@ function Server() {
 
     return () => {
       clearInterval(interval);
-      reload()
+      reload();
     };
   }, [selectedChannel, focused, render]);
-  focustextbox()
+  focustextbox();
   renderservers();
   renderchannels();
 
   selectserver();
-  
- 
-
 
   function focustextbox() {
     if (focused == true) {
-      const textbox = document.querySelector('textarea')
-      textbox.focus()
+      const textbox = document.querySelector("textarea");
+      textbox.focus();
     }
   }
-
 
   function reload() {
     if (focused == false) {
@@ -64,10 +62,7 @@ function Server() {
         setRender(false);
       }
     }
-    
   }
-
-
 
   function selectserver() {
     serverList.forEach((server) => {
@@ -137,15 +132,12 @@ function Server() {
             location.reload();
           }}
           onContextMenu={async (e) => {
-          const id = e.target.id  
+            const id = e.target.id;
             e.preventDefault();
-            const a = await fetch(
-              `http://localhost:3000/isowner${id}`,
-              {
-                method: "GET",
-                credentials: "include",
-              }
-            );
+            const a = await fetch(`http://localhost:3000/isowner${id}`, {
+              method: "GET",
+              credentials: "include",
+            });
             const isowner = await a.json();
             if (isowner.value == "true") {
               setServerSettingsBox([
@@ -255,6 +247,66 @@ function Server() {
         );
       });
     }
+
+    //voicechannelrenderhere
+
+    if (voiceChannelList.length > 0) {
+      voiceChannelList.forEach((channel) => {
+        const a = crypto.randomUUID();
+
+        voicechannelrender.push(
+          <div
+            key={a}
+            id={channel.id}
+            className="channelnames"
+            onContextMenu={async (e) => {
+              const channelid = e.target.id;
+              e.preventDefault();
+              const a = await fetch(
+                `http://localhost:3000/isowner${serverid.id}`,
+                {
+                  method: "GET",
+                  credentials: "include",
+                }
+              );
+              const isowner = await a.json();
+              if (isowner.value == "true") {
+                setChannelSettingsBox([
+                  <div key={crypto.randomUUID()} id="channelsettingsbox">
+                    <h3>{e.target.textContent}</h3>
+                    <div>
+                      <button
+                        onClick={() => {
+                          deletechannel(channelid);
+                        }}
+                      >
+                        Delete Channel
+                      </button>
+                      <button
+                        onClick={() => {
+                          changechannelname(channelid);
+                        }}
+                      >
+                        Change Name
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setChannelSettingsBox([]);
+                      }}
+                    >
+                      ❌
+                    </button>
+                  </div>,
+                ]);
+              }
+            }}
+          >
+            {channel.name}
+          </div>
+        );
+      });
+    }
   }
 
   function openchannel(e) {
@@ -266,7 +318,7 @@ function Server() {
   }
 
   function renderchannelmessages() {
-    let newmessagerender = []
+    let newmessagerender = [];
     if (selectedChannel != null) {
       selectedChannel["messages"].forEach((message) => {
         let deletebutton = null;
@@ -286,7 +338,7 @@ function Server() {
             </button>,
           ];
         }
-       
+
         newmessagerender.push(
           <div id={message.id} className={name} key={crypto.randomUUID()}>
             <div className="individualmessage">{message.message}</div>
@@ -297,7 +349,7 @@ function Server() {
           </div>
         );
       });
-      setChannelMessageRender(newmessagerender)
+      setChannelMessageRender(newmessagerender);
       setSendBar([
         <div key={crypto.randomUUID()} id="sendmessagebar">
           <textarea
@@ -312,7 +364,7 @@ function Server() {
           </button>
         </div>,
       ]);
-    } else if(channelMessageRender.length == 0){
+    } else if (channelMessageRender.length == 0) {
       setChannelMessageRender([
         <h1 className="nothingopened" key={crypto.randomUUID()}>
           Click a Channel to View Group Messages
@@ -321,7 +373,7 @@ function Server() {
           Right Click a Channel to Change its Name or Delete it if You are the
           Owner
         </h1>,
-      ]) 
+      ]);
       console.log(channelMessageRender);
     }
   }
@@ -353,35 +405,38 @@ function Server() {
       }
     });
     if (render == true) {
-      setRender(false)
+      setRender(false);
     } else {
-      setRender(true)
+      setRender(true);
     }
   }
 
   async function sendmessage() {
     const a = crypto.randomUUID();
-    const b = await fetch(`http://localhost:3000/channelmessage${serverid.id}`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: messagetext.current.value,
-        channel_id: selectedChannel.id,
-        messageid: a,
-      }),
-    });
-    const c = await b.json()
-    console.log(c)
+    const b = await fetch(
+      `http://localhost:3000/channelmessage${serverid.id}`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: messagetext.current.value,
+          channel_id: selectedChannel.id,
+          messageid: a,
+        }),
+      }
+    );
+    const c = await b.json();
+    console.log(c);
 
     selectedChannel["messages"].push({
       message: messagetext.current.value,
       user: currentUser.username,
       id: a,
     });
-    setFocused(false)
+    setFocused(false);
   }
   async function addchannel(e) {
     let name = "####";
@@ -454,10 +509,10 @@ function Server() {
       method: "DELETE",
       credentials: "include",
     });
-    navigate('/')
+    navigate("/");
   }
 
-  async function changeservername (id) {
+  async function changeservername(id) {
     let a = prompt("enter new server name:");
     if (a == "") {
       a = "####";
@@ -501,6 +556,7 @@ function Server() {
       <div id="directmessagescontainer">
         <p>Channels</p>
         <div id="directmessages">{channelRender}</div>
+        <div id="voicechannelrender">{voicechannelrender}</div>
         <div id="addmessagecontainer">
           {newChannelButton}
           <button
