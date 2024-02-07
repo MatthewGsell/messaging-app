@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { render } from "react-dom";
 
 function Server() {
+  //voice and video channel are synonimous
   const serverid = useParams();
   const [serverList, setServerList] = useState([]);
   const [channelList, setChannelList] = useState([]);
@@ -16,6 +17,16 @@ function Server() {
   const [channelSettingsBox, setChannelSettingsBox] = useState([]);
   const [newServerBox, setNewServerBox] = useState([]);
   const [serverSettingsBox, setServerSettingsBox] = useState([]);
+  const [membersButton, setMembersButton] = useState([
+    <button
+      onClick={rendermembers}
+      key={crypto.randomUUID()}
+      id="editmembersbutton"
+    >
+      Members
+    </button>,
+  ]);
+  const [membersRender, setMembersRender] = useState([]);
   const [channelMessageRender, setChannelMessageRender] = useState([]);
   const [sendBar, setSendBar] = useState([]);
   const [render, setRender] = useState(false);
@@ -40,12 +51,92 @@ function Server() {
       clearInterval(interval);
       reload();
     };
-  }, [selectedChannel, focused, render]);
+  }, [selectedChannel, focused, render, membersRender]);
   focustextbox();
   renderservers();
   renderchannels();
 
   selectserver();
+
+  async function kickuser(e) {
+    const a = await fetch(`http://localhost:3000/isowner${serverid.id}`, {
+      method: "GET",
+      credentials: "include",
+    });
+    const isowner = await a.json();
+    if (isowner.value == "true") {
+      await fetch(`http://localhost:3000/members${serverid.id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userid: e.target.parentElement.id,
+        }),
+      });
+      location.reload();
+    }
+  }
+
+  async function rendermembers() {
+    let memberlist = [];
+    const a = await fetch(`http://localhost:3000/members${serverid.id}`, {
+      method: "GET",
+      credentials: "include",
+    });
+    const b = await a.json();
+    const c = await fetch(`http://localhost:3000/isowner${serverid.id}`, {
+      method: "GET",
+      credentials: "include",
+    });
+    const isowner = await c.json();
+    if (isowner.value == "true") {
+      memberlist = b.map((member) => {
+        return (
+          <div key={crypto.randomUUID()} id={member.id}>
+            {member.username}
+            <button onClick={kickuser} className="kickuserbutton">
+              Kick
+            </button>
+          </div>
+        );
+      });
+    } else {
+      memberlist = b.map((member) => {
+        return (
+          <div key={crypto.randomUUID()} id={member.id}>
+            {member.username}
+          </div>
+        );
+      });
+    }
+
+    setMembersButton([]);
+
+    setMembersRender([
+      <div key={crypto.randomUUID()} id="memberscontainer">
+        <p>Members</p>
+        <div id="members">{memberlist}</div>
+        <button
+          onClick={() => {
+            setMembersRender([]);
+            setMembersButton([
+              <button
+                onClick={rendermembers}
+                key={crypto.randomUUID()}
+                id="editmembersbutton"
+              >
+                Members
+              </button>,
+            ]);
+          }}
+        >
+          Close
+        </button>
+      </div>,
+    ]);
+  }
 
   function focustextbox() {
     if (focused == true) {
@@ -88,7 +179,7 @@ function Server() {
               <div key={crypto.randomUUID()} id="newchannelbox">
                 <input placeholder="channel name"></input>
                 <button onClick={addchannel}>Text Channel</button>
-                <button onClick={addvoicechannel}>Voice Channel</button>
+                <button onClick={addvoicechannel}>Video Channel</button>
               </div>
             );
           }}
@@ -256,56 +347,56 @@ function Server() {
         const a = crypto.randomUUID();
 
         voicechannelrender.push(
-          <Link to={`/videoroom/${channel.id}`}>
-          <div
-            key={a}
-            id={channel.id}
-            className="channelnames"
-            onContextMenu={async (e) => {
-              const channelid = e.target.id;
-              e.preventDefault();
-              const a = await fetch(
-                `http://localhost:3000/isowner${serverid.id}`,
-                {
-                  method: "GET",
-                  credentials: "include",
+          <Link to={`/videoroom/${channel.id}`} target="_blank">
+            <div
+              key={a}
+              id={channel.id}
+              className="channelnames"
+              onContextMenu={async (e) => {
+                const channelid = e.target.id;
+                e.preventDefault();
+                const a = await fetch(
+                  `http://localhost:3000/isowner${serverid.id}`,
+                  {
+                    method: "GET",
+                    credentials: "include",
+                  }
+                );
+                const isowner = await a.json();
+                if (isowner.value == "true") {
+                  setChannelSettingsBox([
+                    <div key={crypto.randomUUID()} id="channelsettingsbox">
+                      <h3>{e.target.textContent}</h3>
+                      <div>
+                        <button
+                          onClick={() => {
+                            deletechannel(channelid);
+                          }}
+                        >
+                          Delete Channel
+                        </button>
+                        <button
+                          onClick={() => {
+                            changechannelname(channelid);
+                          }}
+                        >
+                          Change Name
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setChannelSettingsBox([]);
+                        }}
+                      >
+                        ❌
+                      </button>
+                    </div>,
+                  ]);
                 }
-              );
-              const isowner = await a.json();
-              if (isowner.value == "true") {
-                setChannelSettingsBox([
-                  <div key={crypto.randomUUID()} id="channelsettingsbox">
-                    <h3>{e.target.textContent}</h3>
-                    <div>
-                      <button
-                        onClick={() => {
-                          deletechannel(channelid);
-                        }}
-                      >
-                        Delete Channel
-                      </button>
-                      <button
-                        onClick={() => {
-                          changechannelname(channelid);
-                        }}
-                      >
-                        Change Name
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setChannelSettingsBox([]);
-                      }}
-                    >
-                      ❌
-                    </button>
-                  </div>,
-                ]);
-              }
-            }}
-          >
-            {channel.name}
-          </div>
+              }}
+            >
+              {channel.name}
+            </div>
           </Link>
         );
       });
@@ -373,9 +464,20 @@ function Server() {
           Click a Channel to View Group Messages
         </h1>,
         <h1 key={crypto.randomUUID()} className="nothingopened">
-          Right Click a Channel to Change its Name or Delete it if You are the
-          Owner
+          Click a Video Channel to Join Group Video Call
         </h1>,
+        <h2 key={crypto.randomUUID()} className="nothingopened">
+          Owners of servers may add channels and video channels. Servers by
+          default on creation have one video channel and one text channel
+          however you may add as many as you would like. Channels may be deleted
+          or their names can be updated via right clicking and the appropriate
+          buttons/prompts.
+        </h2>,
+        <h2 key={crypto.randomUUID} className="nothingopened">
+          You may also kick members if you are the owner of the server by
+          clicking the menues button and hitting the kick button next to the
+          users name.
+        </h2>,
       ]);
       console.log(channelMessageRender);
     }
@@ -455,13 +557,12 @@ function Server() {
       body: JSON.stringify({
         channelname: name,
         channel_id: crypto.randomUUID(),
-        channeltype: "text"
+        channeltype: "text",
       }),
     });
     setNewChannelBox([]);
     location.reload();
   }
-
 
   async function addvoicechannel(e) {
     let name = "####";
@@ -477,14 +578,12 @@ function Server() {
       body: JSON.stringify({
         channelname: name,
         channel_id: crypto.randomUUID(),
-        channeltype: "voice"
+        channeltype: "voice",
       }),
     });
     setNewChannelBox([]);
     location.reload();
   }
-
-
 
   async function deletechannel(channelid) {
     await fetch(`http://localhost:3000/channel${serverid.id}`, {
@@ -533,7 +632,7 @@ function Server() {
   }
 
   async function deleteserver(id) {
-    await fetch(`http://localhost:3000/server${id}`, {
+    await fetch(`http://localhost:3000/server${serverid.id}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -564,6 +663,8 @@ function Server() {
       {newServerBox}
       {channelSettingsBox}
       {serverSettingsBox}
+      {membersButton}
+      {membersRender}
       <div id="serverbarcontainer">
         <p>Servers</p>
         <div id="serverbar">{serverRender}</div>
@@ -580,11 +681,26 @@ function Server() {
         >
           New Server
         </button>
+        <button
+          onClick={() => {
+            navigator.clipboard
+              .writeText(serverid.id)
+              .then(
+                alert(
+                  "Invite code: " +
+                    serverid.id +
+                    " has been copied to clipboard"
+                )
+              );
+          }}
+        >
+          Invite Code
+        </button>
       </div>
       <div id="directmessagescontainer">
         <p>Channels</p>
         <div id="channelsrender">{channelRender}</div>
-        <p>Voice Channels</p>
+        <p>Video Channels</p>
         <div id="voicechannelrender">{voicechannelrender}</div>
         <div id="addmessagecontainer">
           {newChannelButton}
@@ -600,6 +716,9 @@ function Server() {
 
       <div id="directmessage">
         <h1 id="servername">{selectedserver}</h1>
+        <h2 id="channelname">
+          {selectedChannel != null && selectedChannel.name}
+        </h2>
         <div id="individualmessage">{channelMessageRender}</div>
         {sendBar}
       </div>

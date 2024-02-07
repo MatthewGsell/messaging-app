@@ -8,9 +8,9 @@ function VideoRoom() {
   const [users, setUsers] = useState([]);
   const [localTracks, setLocalTracks] = useState([]);
   const [thisUser, setThisUser] = useState();
-  const [channelInfo, setChannelInfo] = useState();
+  const [channelInfo, setChannelInfo] = useState(null);
   const channel = useParams();
-  console.log(channel)
+  console.log(channel);
 
   useEffect(() => {
     if (channelInfo) {
@@ -46,9 +46,7 @@ function VideoRoom() {
             audioTrack: audioTrack,
           });
           client.publish(tracks);
-        });
-    } else {
-      getchannelinfo();
+        }, []);
     }
 
     return () => {
@@ -62,16 +60,20 @@ function VideoRoom() {
     };
   }, [channelInfo]);
 
+  getchannelinfo();
+
   async function getchannelinfo() {
-    const a = await fetch(
-      `http://localhost:3000/agora/video_token${channel.videochannel}`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
-    const b = await a.json();
-    setChannelInfo(b);
+    if (channelInfo === null) {
+      const a = await fetch(
+        `http://localhost:3000/agora/video_token${channel.videochannel}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      const b = await a.json();
+      setChannelInfo(b);
+    }
   }
 
   async function handleUserJoined(user, mediaType) {

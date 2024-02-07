@@ -44,6 +44,6 @@ function generateAccessToken(req, res) {
   });
 }
 
-router.get("/video_token:channel", nocache, generateAccessToken);
+router.get("/video_token:channel", nocache, authorizeuser, generateAccessToken);
 
 module.exports = router;

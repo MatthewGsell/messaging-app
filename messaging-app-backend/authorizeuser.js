@@ -9,7 +9,7 @@ function authorizeuser(req, res, next) {
     req.user = user;
     next();
   } catch (err) {
-    res.clearCookie("token");
+    res.clearCookie("usertoken");
     res.json("not authorized");
   }
 }

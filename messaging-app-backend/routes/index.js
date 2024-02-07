@@ -102,7 +102,6 @@ router.get(
         id: messages[i]._id,
       });
     }
-    console.log(listtosend);
     res.json(listtosend);
   })
 );
@@ -133,7 +132,6 @@ router.delete(
     const item = await DirectMessage.findOne({ _id: req.body.threadid });
     for (i = 0; i < item.messages.length; i++) {
       if (item.messages[i].id == req.body.messageid) {
-        console.log("hey");
         item.messages.splice(i, 1);
         await item.save();
       }
@@ -154,7 +152,6 @@ router.get(
         id: user._id,
       });
     });
-    console.log(messagetosend);
     res.json(messagetosend);
   })
 );
@@ -258,10 +255,8 @@ router.delete(
     const server = await Server.findOne({ _id: req.params.id });
     for (let i = 0; i < server.channels.length; i++) {
       if (server.channels[i].id == req.body.channel) {
-        console.log("yo");
         for (let o = 0; o < server.channels[i].messages.length; o++) {
           if (server.channels[i].messages[o].id == req.body.messageid) {
-            console.log(server.channels[i].messages[o]);
             server.channels[i].messages.splice(o, 1);
             await Server.findByIdAndUpdate(req.params.id, {
               channels: server.channels,
@@ -318,7 +313,6 @@ router.post(
         },
       });
     }
- 
 
     res.json(200);
   })
@@ -330,6 +324,8 @@ router.get(
     const server = await Server.findById(req.params.id);
     if (req.user._id == server.owner) {
       res.json({ value: "true" });
+    } else {
+      res.json({ value: "false" });
     }
   })
 );
@@ -366,15 +362,16 @@ router.put(
         newchannel.name = req.body.name;
         server.channels.splice(i, 1, newchannel);
         await server.save();
-      } 
-    } for (let i = 0; i < server.voice_channels.length; i++) {
+      }
+    }
+    for (let i = 0; i < server.voice_channels.length; i++) {
       if (server.voice_channels[i].id == req.body.channel_id) {
         const newchannel = server.voice_channels[i];
         newchannel.name = req.body.name;
         server.voice_channels.splice(i, 1, newchannel);
         await server.save();
-      } 
-    } 
+      }
+    }
     res.json(200);
   })
 );
@@ -386,8 +383,6 @@ router.post(
     const server = new Server({
       name: req.body.servername,
       users: [req.user._id],
-      channels: [],
-      voice_channels: [],
       owner: req.user._id,
     });
     await server.save();
@@ -398,15 +393,101 @@ router.post(
   })
 );
 
-router.put("/server:id", authorizeuser, asynchandler(async (req, res) => {
-  await Server.findByIdAndUpdate(req.params.id, {name: req.body.name})
-  res.json(200)
-}))
+router.put(
+  "/server:id",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    await Server.findByIdAndUpdate(req.params.id, { name: req.body.name });
+    res.json(200);
+  })
+);
 
-router.delete('/server:id', authorizeuser, asynchandler(async (req, res) => {
-  await Server.findByIdAndDelete(req.params.id)
-  res.json(200)
-}))
+router.delete(
+  "/server:id",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+    await Server.findByIdAndDelete(req.params.id);
+    for (let i = 0; i < user.servers.length; i++) {
+      if (user.servers[i] == req.params.id) {
+        user.servers.splice(i, 1);
+        await user.save();
+      }
+    }
+    res.json(200);
+  })
+);
 
+router.post(
+  "/joinserver",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+    const server = await Server.findById(req.body.serverid);
+    if (!user.servers.includes(req.body.serverid)) {
+      user.servers.push(req.body.serverid);
+      server.users.push(req.user._id);
+      await user.save();
+      await server.save();
+    }
+
+    res.json(200);
+  })
+);
+
+router.get(
+  "/logout",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    res.clearCookie("usertoken");
+    res.json(200);
+  })
+);
+
+router.get(
+  "/members:serverid",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const server = await Server.findById(req.params.serverid);
+    let userlist = [];
+    let useridlist = [];
+    server.users.forEach((userid) => {
+      if (userid != req.user._id) {
+        useridlist.push(userid);
+      }
+    });
+    for (let i = 0; i < useridlist.length; i++) {
+      const user = await User.findById(useridlist[i]);
+      userlist.push({
+        username: user.username,
+        id: user._id,
+      });
+    }
+    res.json(userlist);
+  })
+);
+
+router.delete(
+  "/members:serverid",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    console.log("yoyoyoyoyo");
+    const server = await Server.findById(req.params.serverid);
+    const user = await User.findById(req.body.userid);
+    for (let i = 0; i < server.users.length; i++) {
+      if (server.users[i] == req.body.userid) {
+        server.users.splice(i, 1);
+        await server.save();
+      }
+    }
+    for (let i = 0; i < user.servers.length; i++) {
+      if (user.servers[i] == req.params.serverid) {
+        user.servers.splice(i, 1);
+        await user.save();
+      }
+    }
+    res.json(200);
+  })
+);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import Cookies from "js-cookie";
 function Home() {
   const [serverList, setServerList] = useState([]);
   const [messageList, setMessageList] = useState([]);
@@ -9,7 +10,7 @@ function Home() {
   const [sendBar, setSendBar] = useState([]);
   const [render, setRender] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [serverSettingsBox, setServerSettingsBox] = useState([])
+  const [serverSettingsBox, setServerSettingsBox] = useState([]);
   let serverRender = [];
   let messageRender = [];
 
@@ -22,23 +23,21 @@ function Home() {
     renderservers();
     rendermessages();
     rendermessagethread();
-  
 
     const interval = setInterval(reload, 5000);
 
     return () => {
       clearInterval(interval);
-      reload()
+      reload();
     };
   }, [messageThread, render, focused]);
 
-  focustextbox()
-
+  focustextbox();
 
   function focustextbox() {
     if (focused == true) {
-      const textbox = document.querySelector('textarea')
-      textbox.focus()
+      const textbox = document.querySelector("textarea");
+      textbox.focus();
     }
   }
 
@@ -52,7 +51,6 @@ function Home() {
         setRender(false);
       }
     }
-    
   }
 
   const navigate = useNavigate();
@@ -86,47 +84,44 @@ function Home() {
             navigate("/server/" + server.id);
           }}
           onContextMenu={async (e) => {
-            const id = e.target.id  
-              e.preventDefault();
-              const a = await fetch(
-                `http://localhost:3000/isowner${id}`,
-                {
-                  method: "GET",
-                  credentials: "include",
-                }
-              );
-              const isowner = await a.json();
-              if (isowner.value == "true") {
-                setServerSettingsBox([
-                  <div key={crypto.randomUUID()} id="channelsettingsbox">
-                    <h3>{e.target.textContent}</h3>
-                    <div>
-                      <button
-                        onClick={() => {
-                          deleteserver(id);
-                        }}
-                      >
-                        Delete Server
-                      </button>
-                      <button
-                        onClick={() => {
-                          changeservername(id);
-                        }}
-                      >
-                        Change Name
-                      </button>
-                    </div>
+            const id = e.target.id;
+            e.preventDefault();
+            const a = await fetch(`http://localhost:3000/isowner${id}`, {
+              method: "GET",
+              credentials: "include",
+            });
+            const isowner = await a.json();
+            if (isowner.value == "true") {
+              setServerSettingsBox([
+                <div key={crypto.randomUUID()} id="channelsettingsbox">
+                  <h3>{e.target.textContent}</h3>
+                  <div>
                     <button
                       onClick={() => {
-                        setServerSettingsBox([]);
+                        deleteserver(id);
                       }}
                     >
-                      ❌
+                      Delete Server
                     </button>
-                  </div>,
-                ]);
-              }
-            }}
+                    <button
+                      onClick={() => {
+                        changeservername(id);
+                      }}
+                    >
+                      Change Name
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setServerSettingsBox([]);
+                    }}
+                  >
+                    ❌
+                  </button>
+                </div>,
+              ]);
+            }
+          }}
         >
           {server.name.charAt(0)}
           {server.name.charAt(1)}
@@ -222,7 +217,6 @@ function Home() {
             onFocus={() => {
               setFocused(true);
             }}
-           
           ></textarea>
           <button id="messagesendbutton" onClick={sendmessage}>
             Send
@@ -237,18 +231,18 @@ function Home() {
         <h1 key={crypto.randomUUID()} className="nothingopened">
           Click a Server to Open Server
         </h1>,
-        <h3 key={crypto.randomUUID()} className="nothingopened">
+        <h2 key={crypto.randomUUID()} className="nothingopened">
           Clicking on the server bar while a message thread is open will back
           you out of the message thread
-        </h3>,
-        <h3 key={crypto.randomUUID()} className="nothingopened">
+        </h2>,
+        <h2 key={crypto.randomUUID()} className="nothingopened">
           Closing a message thread does not delete it. If you send a new message
           to that same person the thread will be reopened between you and the
-          other user. It also does not close the thread for them
-        </h3>,
-        <h4 key={crypto.randomUUID()} className="nothingopened">
+          other user. It also does not close the thread for them.
+        </h2>,
+        <h2 key={crypto.randomUUID()} className="nothingopened">
           If both users close the message thread however it will be deleted.
-        </h4>,
+        </h2>,
       ]);
     }
   }
@@ -271,15 +265,14 @@ function Home() {
         messageid: a,
       }),
     });
-    const c = await b.json()
-    messageThread['messages'].push({
+    const c = await b.json();
+    messageThread["messages"].push({
       message: messagetext.current.value,
-          id: c.id,
-          username: c.username,
-    })
-    messagetext.current.value = ''
+      id: c.id,
+      username: c.username,
+    });
+    messagetext.current.value = "";
     setFocused(false);
-    
   }
 
   async function deletemessage(e) {
@@ -303,12 +296,12 @@ function Home() {
       console.log(b);
       if (message.id == b) {
         messageThread["messages"].splice(index, 1);
-      } 
+      }
     });
     if (render == true) {
-      setRender(false)
+      setRender(false);
     } else {
-      setRender(true)
+      setRender(true);
     }
   }
 
@@ -346,11 +339,10 @@ function Home() {
       method: "DELETE",
       credentials: "include",
     });
-    location.reload()
+    location.reload();
   }
 
-  
-  async function changeservername (id) {
+  async function changeservername(id) {
     let a = prompt("enter new server name:");
     if (a == "") {
       a = "####";
@@ -366,6 +358,13 @@ function Home() {
       }),
     });
     location.reload();
+  }
+  async function logout() {
+    await fetch(`http://localhost:3000/logout`, {
+      method: "GET",
+      credentials: "include",
+    });
+    navigate("/login");
   }
 
   return (
@@ -389,6 +388,13 @@ function Home() {
         >
           New Server
         </button>
+        <button
+          onClick={() => {
+            navigate("/joinserver");
+          }}
+        >
+          Join Server
+        </button>
       </div>
       <div id="directmessagescontainer">
         <div id="directmessages">
@@ -403,6 +409,7 @@ function Home() {
           >
             New Message
           </button>
+          <button onClick={logout}>Logout</button>
         </div>
       </div>
 

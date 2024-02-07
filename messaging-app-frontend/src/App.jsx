@@ -7,6 +7,7 @@ import Messages from "./mainpages/Messages";
 import Signup from "./mainpages/Signup";
 import Newmessage from "./mainpages/Newmessage";
 import VideoRoom from "./mainpages/VideoRoom";
+import JoinServer from "./mainpages/JoinServer";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/videoroom">
         <Route path=":videochannel" element={<VideoRoom />} />
       </Route>
+      <Route path="/joinserver" element={<JoinServer />} />
     </Routes>
   );
 }

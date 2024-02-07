@@ -204,7 +204,7 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 78%;
+  height: 85%;
   width: 100%;
 
   overflow-y: scroll;
@@ -564,6 +564,7 @@ a {
 
 #servername {
   text-align: center;
+  margin-bottom: 0;
 }
 #newserverbox {
   display: flex;
@@ -630,6 +631,8 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   margin-top: 50px;
+  margin-left: 200px;
+  margin-right: 200px;
   column-gap: 50px;
   row-gap: 50px;
 }
@@ -639,6 +642,8 @@ a {
 }
 
 #stream-controls {
+  position: sticky;
+  top: 800px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -676,7 +681,6 @@ a {
   width: 100%;
 
   overflow-y: scroll;
-
 }
 #channelsrender::-webkit-scrollbar {
   display: none;
@@ -690,9 +694,132 @@ a {
   width: 100%;
 
   overflow-y: scroll;
-
 }
 
 #voicechannelrender::-webkit-scrollbar {
   display: none;
+}
+#channelname {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+/*join server page*/
+#joinservercontainer {
+  display: flex;
+  background-color: #393938;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+#joinservercontainer > input {
+  height: 30px;
+  width: 800px;
+}
+#joinservercontainer > button {
+  height: 40px;
+  width: 60px;
+  margin-left: 10px;
+  border-radius: 5px;
+  color: white;
+  background-image: linear-gradient(
+    to right bottom,
+    #d00000,
+    #a70038,
+    #6b0c45,
+    #301834,
+    #0a0a0a
+  );
+  font-size: larger;
+  transition: all 0.2s ease-in-out;
+}
+#joinservercontainer > button:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+#editmembersbutton {
+  position: absolute;
+  left: 90%;
+  top: 1%;
+  height: 30px;
+  width: 120px;
+  border-radius: 5px;
+  background-image: linear-gradient(
+    to right bottom,
+    #d00000,
+    #a70038,
+    #6b0c45,
+    #301834,
+    #0a0a0a
+  );
+  color: white;
+  font-weight: bolder;
+}
+#editmembersbutton:hover {
+  cursor: pointer;
+}
+#memberscontainer {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  left: 90%;
+  top: 1%;
+  height: 600px;
+  width: 150px;
+  background-color: #141414;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+#members {
+  height: 80%;
+  width: 100%;
+  overflow-y: scroll;
+}
+#members::-webkit-scrollbar {
+  display: none;
+}
+
+#members > div {
+  width: 100%;
+  text-align: center;
+  height: 5%;
+  margin-top: 5%;
+  transition: all 0.2s ease-in-out;
+}
+
+#members > div:hover {
+  transform: scale(1.1);
+  background-color: #bbb8b2;
+}
+
+#memberscontainer > button {
+  background-image: linear-gradient(
+    to right bottom,
+    #d00000,
+    #a70038,
+    #6b0c45,
+    #301834,
+    #0a0a0a
+  );
+  color: white;
+  border-radius: 5px;
+}
+#memberscontainer > button:hover {
+  cursor: pointer;
+}
+.kickuserbutton {
+  background-color: #d00000;
+  margin-left: 3%;
+  height: 90%;
+  width: 30%;
+  color: white;
+  font-weight: bolder;
+}
+.kickuserbutton:hover {
+  cursor: pointer;
 }
