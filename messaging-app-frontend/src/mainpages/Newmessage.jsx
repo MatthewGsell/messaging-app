@@ -65,6 +65,7 @@ function Newmessage() {
   }
   return (
     <div id="newmessagecontainer">
+      <h1 className="nothingopened">Search for a User</h1>
       <input
         id="usernameinput"
         type="text"
