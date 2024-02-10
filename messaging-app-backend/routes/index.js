@@ -185,6 +185,10 @@ router.post(
         user.messages.push(alreadychat._id);
         await user.save();
       }
+      if (!otheruser.messages.includes(alreadychat._id)) {
+        otheruser.messages.push(alreadychat._id);
+        await otheruser.save();
+      }
       await alreadychat.save();
     } else {
       const a = crypto.randomUUID();
@@ -452,9 +456,7 @@ router.get(
     let userlist = [];
     let useridlist = [];
     server.users.forEach((userid) => {
-      if (userid != req.user._id) {
         useridlist.push(userid);
-      }
     });
     for (let i = 0; i < useridlist.length; i++) {
       const user = await User.findById(useridlist[i]);
@@ -475,6 +477,28 @@ router.delete(
     const user = await User.findById(req.body.userid);
     for (let i = 0; i < server.users.length; i++) {
       if (server.users[i] == req.body.userid) {
+        server.users.splice(i, 1);
+        await server.save();
+      }
+    }
+    for (let i = 0; i < user.servers.length; i++) {
+      if (user.servers[i] == req.params.serverid) {
+        user.servers.splice(i, 1);
+        await user.save();
+      }
+    }
+    res.json(200);
+  })
+);
+
+router.delete(
+  "/leave:serverid",
+  authorizeuser,
+  asynchandler(async (req, res) => {
+    const server = await Server.findById(req.params.serverid);
+    const user = await User.findById(req.user._id);
+    for (let i = 0; i < server.users.length; i++) {
+      if (server.users[i] == req.user._id) {
         server.users.splice(i, 1);
         await server.save();
       }

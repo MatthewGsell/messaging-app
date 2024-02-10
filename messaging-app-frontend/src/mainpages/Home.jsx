@@ -239,9 +239,6 @@ function Home() {
           to that same person the thread will be reopened between you and the
           other user. It also does not close the thread for them.
         </h2>,
-        <h2 key={crypto.randomUUID()} className="nothingopened">
-          If both users close the message thread however it will be deleted.
-        </h2>,
       ]);
     }
   }

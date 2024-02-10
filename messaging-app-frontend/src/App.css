@@ -114,6 +114,7 @@ a {
 
 /*Home container/messages starts here*/
 
+
 #homecontainer {
   display: flex;
   min-height: 100vh;
@@ -156,7 +157,7 @@ a {
 #serverbar {
   display: flex;
   flex-direction: column;
-  height: 90%;
+  height: 83.5%;
   align-items: center;
   overflow-y: scroll;
 }
@@ -224,8 +225,8 @@ a {
   border-right: 2px solid #0a0a0a;
 }
 #addmessagecontainer > button {
-  height: 40%;
-  width: 60%;
+  height: 70px;
+  width: 100px;
   border-radius: 10px;
   color: white;
   font-size: larger;
@@ -330,8 +331,8 @@ a {
 #messagesendbutton {
   margin-left: 2%;
   margin-top: 8%;
-  width: 10%;
-  height: 25%;
+  width: 125px;
+  height: 75px;
   border-radius: 20px;
   background-image: linear-gradient(
     to right bottom,
@@ -351,7 +352,7 @@ a {
 
 .deletemessagebutton {
   margin-left: 5%;
-  width: 5%;
+  width: 80px;
   border-radius: 10px;
   background-color: #bbb8b2;
 }
@@ -385,7 +386,7 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #1f1f1f;
   color: #ffff;
 }
@@ -437,8 +438,8 @@ a {
   width: 60%;
 }
 #messagesendbox > button {
-  width: 8%;
-  height: 22%;
+  width: 125px;
+  height: 75px;
   border-radius: 20px;
   margin-left: 70%;
   background-image: linear-gradient(
@@ -787,7 +788,7 @@ a {
 #members > div {
   width: 100%;
   text-align: center;
-  height: 5%;
+  min-height: 5%;
   margin-top: 5%;
   transition: all 0.2s ease-in-out;
 }
@@ -795,6 +796,9 @@ a {
 #members > div:hover {
   transform: scale(1.1);
   background-color: #bbb8b2;
+}
+#members > div > p {
+  margin: 0;
 }
 
 #memberscontainer > button {
@@ -814,7 +818,7 @@ a {
 }
 .kickuserbutton {
   background-color: #d00000;
-  margin-left: 3%;
+  margin: 0 auto;
   height: 90%;
   width: 30%;
   color: white;
@@ -822,4 +826,20 @@ a {
 }
 .kickuserbutton:hover {
   cursor: pointer;
+}
+
+@media screen and (max-width: 1500px) {
+  #editmembersbutton {
+    left: 80%;
+  }
+  #memberscontainer {
+    left: 80%
+  }
+  #serverbarcontainer > button {
+    width: 75px;
+  }
+  #directmessages {
+
+    height: 80.75%;
+  }
 }

@@ -79,6 +79,11 @@ function Server() {
   }
 
   async function rendermembers() {
+    let u = await fetch(`http://localhost:3000/user`, {
+      method: "GET",
+      credentials: "include",
+    });
+    const thisuser = await u.json()
     let memberlist = [];
     const a = await fetch(`http://localhost:3000/members${serverid.id}`, {
       method: "GET",
@@ -92,14 +97,25 @@ function Server() {
     const isowner = await c.json();
     if (isowner.value == "true") {
       memberlist = b.map((member) => {
-        return (
+        if (member.id != thisuser._id) {
+          return (
+            <div key={crypto.randomUUID()} id={member.id}>
+              <p>{member.username}</p>
+              <button onClick={kickuser} className="kickuserbutton">
+                Kick
+              </button>
+            </div>
+          );
+
+        } else { return (
           <div key={crypto.randomUUID()} id={member.id}>
-            {member.username}
-            <button onClick={kickuser} className="kickuserbutton">
-              Kick
-            </button>
+            <p>{member.username}</p>
+            
           </div>
         );
+
+        }
+        
       });
     } else {
       memberlist = b.map((member) => {
@@ -259,6 +275,29 @@ function Server() {
                 </div>,
               ]);
             }
+            else {
+              setServerSettingsBox([
+                <div key={crypto.randomUUID()} id="channelsettingsbox">
+                  <h3>{e.target.textContent}</h3>
+                  <div>
+                    <button
+                      onClick={() => {
+                        leaveserver()
+                      }}
+                    >
+                      Leave Server
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setServerSettingsBox([]);
+                    }}
+                  >
+                    ❌
+                  </button>
+                </div>,
+              ]);
+            }
           }}
         >
           {server.name.charAt(0)}
@@ -266,6 +305,14 @@ function Server() {
         </div>
       );
     });
+  }
+
+  async function leaveserver() {
+    const a = await fetch(`http://localhost:3000/leave${serverid.id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    navigate("/")
   }
 
   async function getchannels() {
