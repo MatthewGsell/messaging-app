@@ -10,7 +10,6 @@ function Server() {
   const [channelList, setChannelList] = useState([]);
   const [voiceChannelList, setVoiceChannelList] = useState([]);
   const [selectedChannel, setSelectedChannel] = useState();
-  const [selectedVoiceChannel, setSelectedVoiceChannel] = useState();
   const [currentUser, setCurrentUser] = useState();
   const [newChannelBox, setNewChannelBox] = useState([]);
   const [newChannelButton, setNewChannelButton] = useState([]);
@@ -157,7 +156,6 @@ function Server() {
 
   function selectserver() {
     serverList.forEach((server) => {
-      console.log(server);
       if (server.id == serverid.id) {
         selectedserver = server.name.toUpperCase();
       }
@@ -479,14 +477,10 @@ function Server() {
           users name.
         </h2>,
       ]);
-      console.log(channelMessageRender);
     }
   }
 
-  console.log(selectedChannel);
   async function deletemessage(e) {
-    console.log(serverid);
-
     const itemtodelete = e.target.parentElement.parentElement.id;
     const a = await fetch(
       `http://localhost:3000/channelmessage${serverid.id}`,
@@ -534,7 +528,6 @@ function Server() {
       }
     );
     const c = await b.json();
-    console.log(c);
 
     selectedChannel["messages"].push({
       message: messagetext.current.value,

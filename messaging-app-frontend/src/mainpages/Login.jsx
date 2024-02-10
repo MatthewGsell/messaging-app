@@ -24,7 +24,6 @@ function Login() {
     if (incorrect == "incorrect") {
       setError("Username or password is incorrect");
     } else {
-      console.log(incorrect);
       navigate("/");
     }
   }

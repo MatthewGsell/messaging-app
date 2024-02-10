@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import Cookies from "js-cookie";
 function Home() {
   const [serverList, setServerList] = useState([]);
   const [messageList, setMessageList] = useState([]);
@@ -292,8 +291,6 @@ function Home() {
     getmessages();
     const b = await a.json();
     messageThread["messages"].forEach((message, index) => {
-      console.log(message.id);
-      console.log(b);
       if (message.id == b) {
         messageThread["messages"].splice(index, 1);
       }

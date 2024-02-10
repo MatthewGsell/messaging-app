@@ -3,7 +3,6 @@ const { model } = require("mongoose");
 
 function authorizeuser(req, res, next) {
   const token = req.cookies.usertoken;
-  console.log(token);
   try {
     const user = jwt.verify(token, process.env.JWT_SECRET);
     req.user = user;

@@ -20,7 +20,7 @@ function generateAccessToken(req, res) {
     return res.status(500).json({ error: "channel is required" });
   }
 
-  let uid = 0;
+  let uid = req.user.username;
   let role = RtcRole.SUBSCRIBER;
   let expiretime = 3600;
 
@@ -41,6 +41,7 @@ function generateAccessToken(req, res) {
     APP_ID: APP_ID,
     APP_CERTIFICATE: APP_CERTIFICATE,
     channelName: channelName,
+    uid: uid,
   });
 }
 

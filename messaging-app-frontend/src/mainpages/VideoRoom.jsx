@@ -21,6 +21,7 @@ function VideoRoom() {
           channelInfo.APP_ID,
           channelInfo.channelName,
           channelInfo.token,
+          channelInfo.uid,
           null
         )
         .then((uid) => {
@@ -30,14 +31,24 @@ function VideoRoom() {
           const [audioTrack, videoTrack] = tracks;
           setLocalTracks(tracks);
           setUsers((previousUsers) => {
-            return [
-              ...previousUsers,
-              {
+            if (
+              !previousUsers.includes({
                 uid: uid,
                 videoTrack: videoTrack,
                 audioTrack: audioTrack,
-              },
-            ];
+              })
+            ) {
+              return [
+                ...previousUsers,
+                {
+                  uid: uid,
+                  videoTrack: videoTrack,
+                  audioTrack: audioTrack,
+                },
+              ];
+            } else {
+              return [previousUsers];
+            }
           });
 
           setThisUser({
@@ -77,7 +88,6 @@ function VideoRoom() {
   }
 
   async function handleUserJoined(user, mediaType) {
-    console.log("yo");
     await client.subscribe(user, mediaType);
     if (mediaType == "video") {
       setUsers((previousUsers) => {
@@ -149,7 +159,6 @@ function VideoRoom() {
       Video Room
       <div id="usersvideos">
         {users.map((user) => {
-          console.log("yo");
           return <VideoPlayer key={user.uid} user={user} />;
         })}
       </div>

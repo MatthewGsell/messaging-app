@@ -471,7 +471,6 @@ router.delete(
   "/members:serverid",
   authorizeuser,
   asynchandler(async (req, res) => {
-    console.log("yoyoyoyoyo");
     const server = await Server.findById(req.params.serverid);
     const user = await User.findById(req.body.userid);
     for (let i = 0; i < server.users.length; i++) {
