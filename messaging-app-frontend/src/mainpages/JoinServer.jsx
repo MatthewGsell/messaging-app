@@ -6,7 +6,7 @@ function JoinServer() {
   const navigate = useNavigate();
 
   async function joinserver() {
-    await fetch(`http://localhost:3000/joinserver`, {
+    await fetch(`https://messageappsite.com/joinserver`, {
       method: "POST",
       credentials: "include",
       headers: {

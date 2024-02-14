@@ -48,6 +48,8 @@ router.post(
         });
         res.cookie("usertoken", token, {
           httpOnly: true,
+          SameSite: "none",
+          secure: true,
         });
         res.json("correct");
       } else {
@@ -456,7 +458,7 @@ router.get(
     let userlist = [];
     let useridlist = [];
     server.users.forEach((userid) => {
-        useridlist.push(userid);
+      useridlist.push(userid);
     });
     for (let i = 0; i < useridlist.length; i++) {
       const user = await User.findById(useridlist[i]);

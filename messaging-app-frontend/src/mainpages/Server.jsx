@@ -58,13 +58,13 @@ function Server() {
   selectserver();
 
   async function kickuser(e) {
-    const a = await fetch(`http://localhost:3000/isowner${serverid.id}`, {
+    const a = await fetch(`https://messageappsite.com/isowner${serverid.id}`, {
       method: "GET",
       credentials: "include",
     });
     const isowner = await a.json();
     if (isowner.value == "true") {
-      await fetch(`http://localhost:3000/members${serverid.id}`, {
+      await fetch(`https://messageappsite.com/members${serverid.id}`, {
         method: "DELETE",
         credentials: "include",
         headers: {
@@ -79,18 +79,18 @@ function Server() {
   }
 
   async function rendermembers() {
-    let u = await fetch(`http://localhost:3000/user`, {
+    let u = await fetch(`https://messageappsite.com/user`, {
       method: "GET",
       credentials: "include",
     });
-    const thisuser = await u.json()
+    const thisuser = await u.json();
     let memberlist = [];
-    const a = await fetch(`http://localhost:3000/members${serverid.id}`, {
+    const a = await fetch(`https://messageappsite.com/members${serverid.id}`, {
       method: "GET",
       credentials: "include",
     });
     const b = await a.json();
-    const c = await fetch(`http://localhost:3000/isowner${serverid.id}`, {
+    const c = await fetch(`https://messageappsite.com/isowner${serverid.id}`, {
       method: "GET",
       credentials: "include",
     });
@@ -106,16 +106,13 @@ function Server() {
               </button>
             </div>
           );
-
-        } else { return (
-          <div key={crypto.randomUUID()} id={member.id}>
-            <p>{member.username}</p>
-            
-          </div>
-        );
-
+        } else {
+          return (
+            <div key={crypto.randomUUID()} id={member.id}>
+              <p>{member.username}</p>
+            </div>
+          );
         }
-        
       });
     } else {
       memberlist = b.map((member) => {
@@ -179,7 +176,7 @@ function Server() {
   }
 
   async function renderaddchannelbutton() {
-    const a = await fetch(`http://localhost:3000/isowner${serverid.id}`, {
+    const a = await fetch(`https://messageappsite.com/isowner${serverid.id}`, {
       method: "GET",
       credentials: "include",
     });
@@ -205,7 +202,7 @@ function Server() {
   }
 
   async function getcurrentuser() {
-    const a = await fetch("http://localhost:3000/user", {
+    const a = await fetch("https://messageappsite.com/user", {
       method: "GET",
       credentials: "include",
     });
@@ -213,7 +210,7 @@ function Server() {
     setCurrentUser(b);
   }
   async function getservers() {
-    const a = await fetch("http://localhost:3000/servers", {
+    const a = await fetch("https://messageappsite.com/servers", {
       method: "GET",
       credentials: "include",
     });
@@ -240,7 +237,7 @@ function Server() {
           onContextMenu={async (e) => {
             const id = e.target.id;
             e.preventDefault();
-            const a = await fetch(`http://localhost:3000/isowner${id}`, {
+            const a = await fetch(`https://messageappsite.com/isowner${id}`, {
               method: "GET",
               credentials: "include",
             });
@@ -274,15 +271,14 @@ function Server() {
                   </button>
                 </div>,
               ]);
-            }
-            else {
+            } else {
               setServerSettingsBox([
                 <div key={crypto.randomUUID()} id="channelsettingsbox">
                   <h3>{e.target.textContent}</h3>
                   <div>
                     <button
                       onClick={() => {
-                        leaveserver()
+                        leaveserver();
                       }}
                     >
                       Leave Server
@@ -308,15 +304,15 @@ function Server() {
   }
 
   async function leaveserver() {
-    const a = await fetch(`http://localhost:3000/leave${serverid.id}`, {
+    const a = await fetch(`https://messageappsite.com/leave${serverid.id}`, {
       method: "DELETE",
       credentials: "include",
     });
-    navigate("/")
+    navigate("/");
   }
 
   async function getchannels() {
-    const a = await fetch(`http://localhost:3000/channels${serverid.id}`, {
+    const a = await fetch(`https://messageappsite.com/channels${serverid.id}`, {
       method: "GET",
       credentials: "include",
     });
@@ -340,7 +336,7 @@ function Server() {
               const channelid = e.target.id;
               e.preventDefault();
               const a = await fetch(
-                `http://localhost:3000/isowner${serverid.id}`,
+                `https://messageappsite.com/isowner${serverid.id}`,
                 {
                   method: "GET",
                   credentials: "include",
@@ -392,7 +388,11 @@ function Server() {
         const a = crypto.randomUUID();
 
         voicechannelrender.push(
-          <Link to={`/videoroom/${channel.id}`} target="_blank">
+          <Link
+            key={crypto.randomUUID()}
+            to={`/videoroom/${channel.id}`}
+            target="_blank"
+          >
             <div
               key={a}
               id={channel.id}
@@ -401,7 +401,7 @@ function Server() {
                 const channelid = e.target.id;
                 e.preventDefault();
                 const a = await fetch(
-                  `http://localhost:3000/isowner${serverid.id}`,
+                  `https://messageappsite.com/isowner${serverid.id}`,
                   {
                     method: "GET",
                     credentials: "include",
@@ -530,7 +530,7 @@ function Server() {
   async function deletemessage(e) {
     const itemtodelete = e.target.parentElement.parentElement.id;
     const a = await fetch(
-      `http://localhost:3000/channelmessage${serverid.id}`,
+      `https://messageappsite.com/channelmessage${serverid.id}`,
       {
         method: "DELETE",
         credentials: "include",
@@ -560,7 +560,7 @@ function Server() {
   async function sendmessage() {
     const a = crypto.randomUUID();
     const b = await fetch(
-      `http://localhost:3000/channelmessage${serverid.id}`,
+      `https://messageappsite.com/channelmessage${serverid.id}`,
       {
         method: "POST",
         credentials: "include",
@@ -588,7 +588,7 @@ function Server() {
     if (e.target.previousSibling.value != "") {
       name = e.target.previousSibling.value;
     }
-    await fetch(`http://localhost:3000/addchannel${serverid.id}`, {
+    await fetch(`https://messageappsite.com/addchannel${serverid.id}`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -609,7 +609,7 @@ function Server() {
     if (e.target.previousSibling.previousSibling.value != "") {
       name = e.target.previousSibling.previousSibling.value;
     }
-    await fetch(`http://localhost:3000/addchannel${serverid.id}`, {
+    await fetch(`https://messageappsite.com/addchannel${serverid.id}`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -626,7 +626,7 @@ function Server() {
   }
 
   async function deletechannel(channelid) {
-    await fetch(`http://localhost:3000/channel${serverid.id}`, {
+    await fetch(`https://messageappsite.com/channel${serverid.id}`, {
       method: "DELETE",
       credentials: "include",
       headers: {
@@ -644,7 +644,7 @@ function Server() {
     if (a == "") {
       a = "####";
     }
-    await fetch(`http://localhost:3000/channel${serverid.id}`, {
+    await fetch(`https://messageappsite.com/channel${serverid.id}`, {
       method: "PUT",
       credentials: "include",
       headers: {
@@ -658,7 +658,7 @@ function Server() {
     location.reload();
   }
   async function newserver(e) {
-    await fetch(`http://localhost:3000/server`, {
+    await fetch(`https://messageappsite.com/server`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -672,7 +672,7 @@ function Server() {
   }
 
   async function deleteserver(id) {
-    await fetch(`http://localhost:3000/server${serverid.id}`, {
+    await fetch(`https://messageappsite.com/server${serverid.id}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -684,7 +684,7 @@ function Server() {
     if (a == "") {
       a = "####";
     }
-    await fetch(`http://localhost:3000/server${id}`, {
+    await fetch(`https://messageappsite.com/server${id}`, {
       method: "PUT",
       credentials: "include",
       headers: {

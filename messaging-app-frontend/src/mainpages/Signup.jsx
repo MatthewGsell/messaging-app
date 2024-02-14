@@ -7,7 +7,7 @@ function Signup() {
   const [error, setError] = useState();
   const navigate = useNavigate();
   async function databasesignup() {
-    const a = await fetch("http://localhost:3000/signup", {
+    const a = await fetch("https://messageappsite.com/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

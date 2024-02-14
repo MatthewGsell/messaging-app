@@ -13,7 +13,7 @@ function Newmessage() {
   filterusers();
 
   async function getusers() {
-    const a = await fetch("http://localhost:3000/users", {
+    const a = await fetch("https://messageappsite.com/users", {
       method: "GET",
       credentials: "include",
     });
@@ -50,7 +50,7 @@ function Newmessage() {
   async function sendfirstmessage(e) {
     const message = e.target.previousSibling.value;
 
-    await fetch("http://localhost:3000/firstmessage", {
+    await fetch("https://messageappsite.com/firstmessage", {
       method: "POST",
       credentials: "include",
       headers: {

@@ -54,7 +54,7 @@ function Home() {
 
   const navigate = useNavigate();
   async function isloggedin() {
-    const a = await fetch("http://localhost:3000/", {
+    const a = await fetch("https://messageappsite.com/", {
       method: "GET",
       credentials: "include",
     });
@@ -63,7 +63,7 @@ function Home() {
     }
   }
   async function getservers() {
-    const a = await fetch("http://localhost:3000/servers", {
+    const a = await fetch("https://messageappsite.com/servers", {
       method: "GET",
       credentials: "include",
     });
@@ -85,7 +85,7 @@ function Home() {
           onContextMenu={async (e) => {
             const id = e.target.id;
             e.preventDefault();
-            const a = await fetch(`http://localhost:3000/isowner${id}`, {
+            const a = await fetch(`https://messageappsite.com/isowner${id}`, {
               method: "GET",
               credentials: "include",
             });
@@ -130,7 +130,7 @@ function Home() {
   }
 
   async function getmessages() {
-    const a = await fetch("http://localhost:3000/message", {
+    const a = await fetch("https://messageappsite.com/message", {
       method: "GET",
       credentials: "include",
     });
@@ -249,7 +249,7 @@ function Home() {
 
   async function sendmessage() {
     const a = crypto.randomUUID();
-    const b = await fetch("http://localhost:3000/message", {
+    const b = await fetch("https://messageappsite.com/message", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -274,7 +274,7 @@ function Home() {
   async function deletemessage(e) {
     e.target.classList.add("beingdeleted");
     const itemtodelete = e.target.parentElement.parentElement.id;
-    const a = await fetch("http://localhost:3000/message", {
+    const a = await fetch("https://messageappsite.com/message", {
       method: "DELETE",
       credentials: "include",
       headers: {
@@ -301,7 +301,7 @@ function Home() {
 
   async function closedm() {
     console.log(messageThread);
-    await fetch("http://localhost:3000/closedm", {
+    await fetch("https://messageappsite.com/closedm", {
       method: "DELETE",
       credentials: "include",
       headers: {
@@ -315,7 +315,7 @@ function Home() {
   }
 
   async function newserver(e) {
-    await fetch(`http://localhost:3000/server`, {
+    await fetch(`https://messageappsite.com/server`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -329,7 +329,7 @@ function Home() {
   }
 
   async function deleteserver(id) {
-    await fetch(`http://localhost:3000/server${id}`, {
+    await fetch(`https://messageappsite.com/server${id}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -341,7 +341,7 @@ function Home() {
     if (a == "") {
       a = "####";
     }
-    await fetch(`http://localhost:3000/server${id}`, {
+    await fetch(`https://messageappsite.com/server${id}`, {
       method: "PUT",
       credentials: "include",
       headers: {
@@ -354,7 +354,7 @@ function Home() {
     location.reload();
   }
   async function logout() {
-    await fetch(`http://localhost:3000/logout`, {
+    await fetch(`https://messageappsite.com/logout`, {
       method: "GET",
       credentials: "include",
     });

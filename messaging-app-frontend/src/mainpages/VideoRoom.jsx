@@ -76,7 +76,7 @@ function VideoRoom() {
   async function getchannelinfo() {
     if (channelInfo === null) {
       const a = await fetch(
-        `http://localhost:3000/agora/video_token${channel.videochannel}`,
+        `https://messageappsite.com/agora/video_token${channel.videochannel}`,
         {
           method: "GET",
           credentials: "include",

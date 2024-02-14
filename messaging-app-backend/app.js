@@ -6,11 +6,11 @@ var logger = require("morgan");
 require("dotenv").config();
 const cors = require("cors");
 const mongoose = require("mongoose");
-const Message = require("../messaging-app-backend/database-models/message");
+const Message = require("./database-models/message");
 mongoose.connect(process.env.MONGO_DB_URL);
 
 var indexRouter = require("./routes/index");
-const tokenserver = require("../messaging-app-backend/routes/tokenserver");
+const tokenserver = require("./routes/tokenserver");
 var app = express();
 
 // view engine setup
