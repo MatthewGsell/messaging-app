@@ -10,6 +10,7 @@ function Home() {
   const [render, setRender] = useState(false);
   const [focused, setFocused] = useState(false);
   const [serverSettingsBox, setServerSettingsBox] = useState([]);
+  const [loggedInn, setLoggedIn] = useState(false);
   let serverRender = [];
   let messageRender = [];
 
@@ -29,7 +30,7 @@ function Home() {
       clearInterval(interval);
       reload();
     };
-  }, [messageThread, render, focused]);
+  }, [messageThread, render, focused, loggedInn]);
 
   focustextbox();
 
@@ -60,6 +61,8 @@ function Home() {
     });
     if ((await a.json()) === "not authorized") {
       navigate("/login");
+    } else {
+      setLoggedIn(true);
     }
   }
   async function getservers() {
@@ -361,58 +364,66 @@ function Home() {
     navigate("/login");
   }
 
-  return (
-    <div id="homecontainer">
-      {newServerBox}
-      {serverSettingsBox}
-      <div onClick={clickoutsidemessage} id="serverbarcontainer">
-        <p>Servers</p>
-        <div id="serverbar">{serverRender}</div>
-        <button
-          id="addserverbutton"
-          onClick={(e) => {
-            setNewServerBox([
-              <div key={crypto.randomUUID()} id="newserverbox">
-                <input placeholder="server name"></input>
-                <button onClick={newserver}>Add</button>
-              </div>,
-            ]);
-            e.stopPropagation();
-          }}
-        >
-          New Server
-        </button>
-        <button
-          onClick={() => {
-            navigate("/joinserver");
-          }}
-        >
-          Join Server
-        </button>
-      </div>
-      <div id="directmessagescontainer">
-        <div id="directmessages">
-          <p>Open Message Threads</p>
-          {messageRender}
-        </div>
-        <div id="addmessagecontainer">
+  if (loggedInn) {
+    return (
+      <div id="homecontainer">
+        {newServerBox}
+        {serverSettingsBox}
+        <div onClick={clickoutsidemessage} id="serverbarcontainer">
+          <p>Servers</p>
+          <div id="serverbar">{serverRender}</div>
           <button
-            onClick={() => {
-              navigate("/newmessage");
+            id="addserverbutton"
+            onClick={(e) => {
+              setNewServerBox([
+                <div key={crypto.randomUUID()} id="newserverbox">
+                  <input placeholder="server name"></input>
+                  <button onClick={newserver}>Add</button>
+                </div>,
+              ]);
+              e.stopPropagation();
             }}
           >
-            New Message
+            New Server
           </button>
-          <button onClick={logout}>Logout</button>
+          <button
+            onClick={() => {
+              navigate("/joinserver");
+            }}
+          >
+            Join Server
+          </button>
+        </div>
+        <div id="directmessagescontainer">
+          <div id="directmessages">
+            <p>Open Message Threads</p>
+            {messageRender}
+          </div>
+          <div id="addmessagecontainer">
+            <button
+              onClick={() => {
+                navigate("/newmessage");
+              }}
+            >
+              New Message
+            </button>
+            <button onClick={logout}>Logout</button>
+          </div>
+        </div>
+
+        <div id="directmessage">
+          <div id="individualmessage">{directMessageRender}</div>
+          {sendBar}
         </div>
       </div>
-
-      <div id="directmessage">
-        <div id="individualmessage">{directMessageRender}</div>
-        {sendBar}
+    );
+  } else {
+    return (
+      <div id="homecontainer">
+        <h1 id="loadingh1">Loading...</h1>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default Home;

@@ -48,16 +48,24 @@ router.post(
         });
         res.cookie("usertoken", token, {
           httpOnly: true,
-          SameSite: "none",
+          sameSite: "none",
           secure: true,
         });
         res.json("correct");
       } else {
-        res.clearCookie("usertoken");
+        res.clearCookie("usertoken", {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+        });
         res.json("incorrect");
       }
     } else {
-      res.clearCookie("usertoken");
+      res.clearCookie("usertoken", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      });
       res.json("incorrect");
     }
   })
@@ -445,7 +453,11 @@ router.get(
   "/logout",
   authorizeuser,
   asynchandler(async (req, res) => {
-    res.clearCookie("usertoken");
+    res.clearCookie("usertoken", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
     res.json(200);
   })
 );
