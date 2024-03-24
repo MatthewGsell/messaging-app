@@ -16,4 +16,3 @@ Login Page ![Vite + React - Google Chrome 3_22_2024 3_07_02 PM](https://github.c
 
 
 
-![Vite + React - Google Chrome 3_22_2024 3_15_32 PM](https://github.com/MatthewGsell/messaging-app/assets/122045067/1cc8dc23-675d-48da-b318-1c58b996cae6)
